@@ -16,7 +16,7 @@ It contains two main features,
     - Browse Viewer
     - Custom Viewer
 
-Besides, DDV provides the methods to integrate with your own customized image filter process and document boundary detect process. 
+Besides, DDV provides the methods to integrate with your own customized image filter process and document boundary detect process.
 
 - Image filter
 - Document detection (Recommend using [Dynamsoft Document Normalizer](https://www.dynamsoft.com/document-normalizer/docs/web/programming/javascript/))
@@ -38,18 +38,8 @@ With DDV, you can easily and efficiently create a document manage web applicatio
 
 The SDK requires the following features to work:
 
-- Secure context (HTTPS deployment)
-
-  When deploying your application / website for production, make sure to serve it via a secure HTTPS connection. This is required for two reasons
-  
-  - Access to the camera video stream is only granted in a security context. Most browsers impose this restriction.
-	> Some browsers like Chrome may grant the access for `http://127.0.0.1` and `http://localhost` or even for pages opened directly from the local disk (`file:///...`). This can be helpful for temporary development and test.
-  
-  - Dynamsoft License requires a secure context to work.
-
 - `WebAssembly`, `Blob`, `URL`/`createObjectURL`, `Web Workers`
 
-  The above four features are required for the SDK to work.
 
 ## License Key
 
@@ -75,6 +65,59 @@ Dynamsoft Document Viewer relies on the files in the `/dist/` folder to work. Ma
 
 If you are making use of the `CDN` [jsDelivr](https://cdn.jsdelivr.net/npm/ddv), you will still need to host the `/dist/` folder somewhere on your server and refer to it by specifying the path with [`engineResourcePath`](https://www.dynamsoft.com/document-viewer/docs/api/interface/configuration.html#engineresourcepath) by using [`Dynamsoft.DDV.setConfig()`](https://www.dynamsoft.com/document-viewer/docs/api/namespace/ddv.html#static-setconfig). 
 
+
+## Adding the dependency
+
+Please refer to [this article](https://www.dynamsoft.com/document-viewer/docs/gettingstarted/add_dependency.html).
+
+## Creating HelloWorld
+
+[How to create HelloWorld](https://www.dynamsoft.com/document-viewer/docs/gettingstarted/helloworld.html)
+
+Review the complete code:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DDV - HelloWorld</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dynamsoft-document-viewer@latest/dist/ddv.css">
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-document-viewer@latest/dist/ddv.js"></script>
+</head>
+<style>
+    html,body {
+        width: 100%;
+        height: 100%;
+        margin:0;
+        padding:0;
+        overscroll-behavior-y: none;
+        overflow: hidden;
+    }
+
+    #container {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+<body>
+    <div id="container"></div>
+</body>
+<script type="module">
+    (async () => {
+        await Dynamsoft.DDV.setConfig({
+            license: "your-own-license",
+            engineResourcePath: "https://cdn.jsdelivr.net/npm/dynamsoft-document-viewer@latest/dist/engine",
+        });
+        const editViewer = new Dynamsoft.DDV.EditViewer({
+            container: "container",
+        });
+    })();
+</script>
+</html>
+```
 
 ## Documentation
 
