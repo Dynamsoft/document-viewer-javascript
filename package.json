@@ -14,7 +14,7 @@
     "files": [
 		"Api Reference.html",
 		"legal.txt",
-        "dist/ddv.css",
+		"dist/ddv.css",
 		"dist/ddv.es.js",
 		"dist/ddv.js",
 		"dist/index.d.ts",
@@ -50,7 +50,7 @@
     "optionalDependencies": {},
     "repository": {
         "type": "git",
-        "url": "https://github.com/Dynamsoft/Document-Viewer-Javascript"
+        "url": "https://github.com/Dynamsoft/document-viewer-javascript"
     },
     "types": "dist/index.d.ts",
 	"type": "module",
