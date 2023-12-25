@@ -50,7 +50,7 @@
     "optionalDependencies": {},
     "repository": {
         "type": "git",
-        "url": "https://github.com/Dynamsoft/Dynamsoft-Document-Viewer"
+        "url": "https://github.com/Dynamsoft/Document-Viewer-Javascript"
     },
     "types": "dist/index.d.ts",
 	"type": "module",
