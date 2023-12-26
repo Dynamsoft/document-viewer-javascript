@@ -81,6 +81,9 @@ Review the complete code:
 <script type="module">
     (async () => {
         await Dynamsoft.DDV.setConfig({
+           // Public trial license which is valid for 24 hours
+           //You can request a 30-day trial key from   
+           //https://www.dynamsoft.com/customer/license/trialLicense/?product=ddv
             license: "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9",
             engineResourcePath: "https://cdn.jsdelivr.net/npm/dynamsoft-document-viewer@latest/dist/engine",
         });
