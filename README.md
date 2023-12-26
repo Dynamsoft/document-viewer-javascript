@@ -81,7 +81,7 @@ Review the complete code:
 <script type="module">
     (async () => {
         await Dynamsoft.DDV.setConfig({
-            license: "your-own-license",
+            license: "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9",
             engineResourcePath: "https://cdn.jsdelivr.net/npm/dynamsoft-document-viewer@latest/dist/engine",
         });
         Dynamsoft.DDV.setProcessingHandler("imageFilter", new Dynamsoft.DDV.ImageFilter());
