@@ -35,6 +35,19 @@ The SDK requires the following features to work:
 
 - `WebAssembly`, `Blob`, `URL`/`createObjectURL`, `Web Workers`
 
+## Supported Browsers
+
+The following table is a list of supported browsers based on the above requirements:
+
+| Browser Name |             PC                   |   Mobile    |
+| :----------: | :------------------------------: | :---------: |
+|    Chrome    |             v75+                 |   v75+      |
+|   Firefox    |             v69+                 |   v79+      |
+|    Safari    |             v14+                 |   v15+      |
+|     Edge     |             v79+                 |   v92+      |
+
+Apart from the browsers, the operating systems may impose some limitations of their own that could restrict the use of the SDKs.
+
 ## License Key
 
 [![](https://img.shields.io/badge/Get-30--day%20FREE%20Trial%20License-blue)](https://www.dynamsoft.com/customer/license/trialLicense/?product=ddv&utm_source=npm)
@@ -57,8 +70,8 @@ Review the complete code:
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DDV - HelloWorld</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dynamsoft-document-viewer@latest/dist/ddv.css">
-    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-document-viewer@latest/dist/ddv.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dynamsoft-document-viewer@1.1.0/dist/ddv.css">
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-document-viewer@1.1.0/dist/ddv.js"></script>
 </head>
 <style>
     html,body {
@@ -80,13 +93,11 @@ Review the complete code:
 </body>
 <script type="module">
     (async () => {
-        await Dynamsoft.DDV.setConfig({
-           // Public trial license which is valid for 24 hours
-           //You can request a 30-day trial key from   
-           //https://www.dynamsoft.com/customer/license/trialLicense/?product=ddv
-            license: "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9",
-            engineResourcePath: "https://cdn.jsdelivr.net/npm/dynamsoft-document-viewer@latest/dist/engine",
-        });
+        // Public trial license which is valid for 24 hours
+        // You can request a 30-day trial key from https://www.dynamsoft.com/customer/license/trialLicense/?product=ddv
+        Dynamsoft.DDV.Core.license = "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9";
+        Dynamsoft.DDV.Core.engineResourcePath = "https://cdn.jsdelivr.net/npm/dynamsoft-document-viewer@1.1.0/dist/engine";
+        await Dynamsoft.DDV.Core.init();
         Dynamsoft.DDV.setProcessingHandler("imageFilter", new Dynamsoft.DDV.ImageFilter());
         const editViewer = new Dynamsoft.DDV.EditViewer({
             container: "container",

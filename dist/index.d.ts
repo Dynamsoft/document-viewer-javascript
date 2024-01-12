@@ -30,21 +30,24 @@ declare class BaseBrowseViewer implements IBrowseViewer {
 	show(): void;
 	hide(): void;
 	getSelectedPageIndices(): number[];
-	/**
-	 * Select all pages of the activated document.
-	 * @returns A boolean value represent whether the operation is successful.
-	 */
 	selectAllPages(): string[];
-	/**
-	 *  Select the pages according the index of pages in the activated document.
-	 * @param indices - The index of pages to be selected.
-	 * @returns A boolean value represent whether the operation is successful.
-	 */
 	selectPages(indices: number[]): string[];
 	setRowAndColumn(row: number, column: number): boolean;
 	on<K extends keyof BrowseViewerEventMap>(eventName: K, listener: (event: BrowseViewerEventMap[K]) => any): void;
 	off<K extends keyof BrowseViewerEventMap>(eventName: K, listener?: (event: BrowseViewerEventMap[K]) => any): void;
 	destroy(): void;
+}
+declare class Core {
+	#private;
+	get versionInfo(): DDVVersionInfo;
+	set engineResourcePath(path: string);
+	get engineResourcePath(): string;
+	set license(license: string);
+	get license(): string;
+	set deviceFriendlyName(name: string);
+	get deviceFriendlyName(): string;
+	loadWasm(): Promise<void>;
+	init(): Promise<ConfigResult>;
 }
 declare class DocumentDetect implements IDocumentDetect {
 	#private;
@@ -66,7 +69,7 @@ declare class DocumentManager {
 	 * @param options - The configuration used to create a document.
 	 * @returns An empty document object.
 	 */
-	createDocument(options?: CreateDocumentOptions): IDocument | null;
+	createDocument(options?: CreateDocumentOptions): IDocument;
 	/**
 	 * Get the document with the document uid.
 	 * @param docUid - The uid of the target document.
@@ -83,7 +86,7 @@ declare class DocumentManager {
 	deleteAllDocuments(): boolean;
 	copyPagesToDocument(sourceDocUid: string, targetDocUid: string, transferOptions?: TransferOptions): boolean;
 	movePagesToDocument(sourceDocUid: string, targetDocUid: string, transferOptions?: TransferOptions): boolean;
-	mergeDocuments(docUids: string[], options?: MergeDocumentsOptions): IDocument | null;
+	mergeDocuments(docUids: string[], options?: MergeDocumentsOptions): IDocument;
 	on<K extends keyof DocumentManagerEventMap>(eventName: K, listener: (event: DocumentManagerEventMap[K]) => any): void;
 	off<K extends keyof DocumentManagerEventMap>(eventName: K, listener?: (event: DocumentManagerEventMap[K]) => any): void;
 }
@@ -149,7 +152,7 @@ declare class ImageFilterHandler implements IImageFilter {
 	applyFilter(type: string): Promise<ArrayBuffer>;
 	queryParams(type: string): any;
 	get defaultFilterType(): string;
-	querySupported(): ImageFilterMethod[];
+	querySupported(): ImageFilterItem[];
 	destroy(): void;
 }
 declare class ImageIOWasmEnv {
@@ -166,10 +169,10 @@ declare class ImageIOWasmEnv {
 	static getLicenseInfo(license: any, isLts: boolean, uuid: string): Promise<any>;
 	private static Init;
 	static isResourceDirValid(): Promise<boolean>;
-	static loadPdfReader(license: any, isLts: boolean, uuid: string): Promise<boolean>;
-	static loadMain(license: any, isLts: boolean, uuid: string): Promise<boolean>;
+	static loadPdfReader(license: any, isLts: boolean, uuid: string): Promise<any>;
+	static loadMain(license: any, isLts: boolean, uuid: string): Promise<any>;
 	static load(license: any, isLts: boolean, uuid: string): Promise<void>;
-	static preloadModule(name: WasmModuleName): Promise<void>;
+	static preloadModule(name: WasmModuleName): Promise<any>;
 	static unloadMainWorker(): void;
 	static unloadPdfReaderWorker(): void;
 	static unloadDocumentDetectorWorker(): void;
@@ -182,7 +185,8 @@ declare const Version: string;
 declare enum WorkerName {
 	core = "ddv-core",
 	reader = "ddv-reader",
-	detector = "ddv-detector"
+	detector = "ddv-detector",
+	loader = "ddv-loader"
 }
 export declare class BrowseViewer extends BaseBrowseViewer {
 	constructor(options: BrowseViewerConstructorOptions);
@@ -455,6 +459,8 @@ export declare class PerspectiveViewer {
 export declare const DDV: {
 	/** The document manager object */
 	documentManager: DocumentManager;
+	/** The configuration object */
+	Core: Core;
 	Elements: typeof Elements;
 	DocumentDetect: typeof DocumentDetect;
 	ImageFilter: typeof ImageFilterHandler;
@@ -463,15 +469,19 @@ export declare const DDV: {
 	CustomViewer: typeof CustomViewer;
 	EditViewer: typeof EditViewer;
 	PerspectiveViewer: typeof PerspectiveViewer;
-	readonly versionInfo: DDVVersionInfo;
 	readonly lastError: DDVError;
 	Experiments: {
 		get(name: string, params?: any): any;
 		set(name: string, value: any): any;
 	};
-	setConfig(config: Configuration): Promise<ConfigResult>;
 	getDefaultUiConfig(viewerType: ViewerType): UiConfig | null;
 	setProcessingHandler<K extends keyof ProcessingHandlerMap>(type: K, handler: ProcessingHandlerMap[K]): void;
+	/**
+	 * Set a filter parser to the DDV system.
+	 * @param mine - The MIME type of file.
+	 * @param parserClass - The constructor of the file parser.
+	 */
+	setFileParser(mine: string, parserClass: FileParserConstructor): void;
 	unload(): void;
 	clearLastError(): void;
 	on<K_1 extends keyof DDVEventMap>(eventName: K_1, listener: (event: DDVEventMap[K_1]) => any): void;
@@ -600,29 +610,6 @@ export interface BrowseViewerConfig {
 	scrollToLatest?: boolean;
 	enableDragPage?: boolean;
 }
-export interface BrowseViewerConfig {
-	canvasStyle?: CanvasStyle;
-	currentPageStyle?: BaseStyle;
-	pageStyle?: BaseStyle;
-	selectedPageStyle?: BaseStyle;
-	hoveredPageStyle?: BaseStyle;
-	placeholderStyle?: BaseStyle;
-	pageNumberStyle?: PageNumberStyle;
-	checkboxStyle?: CheckboxStyle;
-	rows?: number;
-	columns?: number;
-	scrollDirection?: "horizontal" | "vertical";
-	multiselectMode?: boolean;
-	scrollToLatest?: boolean;
-	enableDragPage?: boolean;
-}
-export interface BrowseViewerConstructorOptions {
-	container?: string | HTMLElement;
-	viewerConfig?: BrowseViewerConfig;
-	uiConfig?: UiConfig;
-	/** The uid of the controller/viewer to be synced */
-	groupUid?: string;
-}
 export interface BrowseViewerConstructorOptions {
 	container?: string | HTMLElement;
 	viewerConfig?: BrowseViewerConfig;
@@ -700,12 +687,7 @@ export interface CheckboxStyle {
 }
 export interface ConfigResult {
 	licenseInfo: string;
-	deviceId?: string;
-}
-export interface Configuration {
-	license: string;
-	deviceFriendlyName?: string;
-	engineResourcePath: string;
+	deviceUuid?: string;
 }
 export interface CreateDocumentOptions {
 	name?: string;
@@ -854,6 +836,9 @@ export interface ExtraPageData {
 	filter?: string;
 	perspectiveQuad?: Quad;
 }
+export interface FileParserConstructor {
+	new (): IFileParser;
+}
 export interface FitModeChangedEvent {
 	readonly oldFitMode: FitModeEnum;
 	readonly newFitMode: FitModeEnum;
@@ -888,7 +873,8 @@ export interface IDocument {
 	loadSource(fileData: Blob | Blob[], index?: number): Promise<string[]>;
 	loadSource(sources: Source | Source[], index?: number): Promise<string[]>;
 	getPageData(pageUid: string): Promise<PageData>;
-	updatePage(pageUid: string, data: Blob): Promise<boolean>;
+	insertBlankPage(pageWidth: number, pageHeight: number, insertBeforeIndex?: number): string;
+	updatePage(pageUid: string, data: Blob, options?: UpdatePageOptions): Promise<boolean>;
 	setPageCustomData(pageUid: string, data: any): Promise<boolean>;
 	getPageCustomData(pageUid: string): Promise<any>;
 	deletePages(indices: number[]): boolean;
@@ -908,8 +894,17 @@ export interface IDocumentDetect {
 	detect(image: VImageData, config?: DocumentDetectConfig): Promise<DocumentDetectResult>;
 	destroy(): void;
 }
+export interface IFileParser {
+	once: boolean;
+	getPageCount(file: Blob, options?: any): Promise<number>;
+	parse(file: Blob, options?: any): Promise<ParsedPage[]>;
+	parse(file: Blob, indices: number[], options?: any): Promise<ParsedPage[]>;
+	getPage(index: number, options?: any): Promise<ParsedPage>;
+	cancelGetPage(index: number): void;
+	destroy(): void;
+}
 export interface IImageFilter {
-	querySupported(): ImageFilterMethod[];
+	querySupported(): ImageFilterItem[];
 	get defaultFilterType(): string;
 	applyFilter(image: VImageData, type: string): Promise<Blob>;
 	destroy(): void;
@@ -964,7 +959,7 @@ export interface IconComponent {
 	PrevPage?: string;
 	ImagePreview?: string;
 }
-export interface ImageFilterMethod {
+export interface ImageFilterItem {
 	type: string;
 	label: string;
 }
@@ -1038,6 +1033,23 @@ export interface PagesDeletedEvent {
 	readonly docUid: string;
 	readonly pageUids: string[];
 	readonly indices: number[];
+}
+export interface ParsedAnnotation {
+	type: string;
+	style: any;
+}
+export interface ParsedPage {
+	fileIndex: number;
+	data?: Blob;
+	width?: number;
+	height?: number;
+	annotations?: ParsedAnnotation[];
+	bitDepth?: number;
+	resolutionX?: number;
+	resolutionY?: number;
+	rotation?: number;
+	pageWidth?: number;
+	pageHeight?: number;
 }
 export interface PerspectiveViewerConfig {
 	canvasStyle?: CanvasStyle;
@@ -1219,8 +1231,14 @@ export interface UiConfig {
 	style?: Partial<CSSStyleDeclaration>;
 	className?: string;
 	label?: string;
-	events?: Record<string, string>;
+	events?: Partial<Record<keyof GlobalEventHandlersEventMap, any>>;
 	children?: (UiConfig | string)[];
+}
+export interface UpdatePageOptions {
+	fileIndex?: number;
+	filter?: string;
+	rotation?: number;
+	perspectiveQuad?: Quad;
 }
 export interface VError {
 	code: number;
@@ -1293,6 +1311,6 @@ export type Quad = [
 ];
 export type ToolMode = "pan" | "crop";
 export type ViewerType = "editViewer" | "perspectiveViewer" | "captureViewer" | "browseViewer";
-export type WasmModuleName = "core" | "pdf";
+export type WasmModuleName = "core" | "pdf" | "proc";
 
 export {};
