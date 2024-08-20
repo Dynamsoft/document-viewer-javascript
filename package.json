@@ -33,8 +33,8 @@
         "perspective transformation",
         "image filter",
         "document detect",
-		"annotation",
-		"pdf viewer"
+        "annotation",
+        "pdf viewer"
     ],
     "main": "dist/ddv.es.js",
     "module": "dist/ddv.es.js",
