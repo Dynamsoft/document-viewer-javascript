@@ -21,6 +21,8 @@ declare class BaseAnnotation<T> {
 	constructor(options: T);
 	get type(): string;
 	get pageUid(): string;
+	get flattened(): boolean;
+	set flattened(value: boolean);
 	getOptions(): T;
 	updateOptions(options: T): boolean;
 }
@@ -60,22 +62,13 @@ declare class BaseBrowseViewer implements IBrowseViewer {
 	selectAllPages(): string[];
 	selectPages(indices: number[]): string[];
 	setRowAndColumn(row: number, column: number): boolean;
+	on(eventName: string, listener: (...args: any[]) => void): void;
 	on<K extends keyof BrowseViewerEventMap>(eventName: K, listener: (event: BrowseViewerEventMap[K]) => any): void;
+	off(eventName: string, listener: (...args: any[]) => void): void;
 	off<K extends keyof BrowseViewerEventMap>(eventName: K, listener?: (event: BrowseViewerEventMap[K]) => any): void;
 }
 declare class BaseEvent implements IDomainEvent {
 	constructor(type: string);
-}
-declare class CameraChangedEvent extends BaseEvent {
-	readonly oldDeviceId: string;
-	readonly newDeviceId: string;
-	static create(oldDeviceId: string, newDeviceId: string): CameraChangedEvent;
-	constructor(oldDeviceId: string, newDeviceId: string);
-}
-declare class CapturedEvent extends BaseEvent {
-	readonly pageUid: string;
-	static create(pageUid: string): CapturedEvent;
-	constructor(pageUid: string);
 }
 declare class Core {
 	#private;
@@ -88,40 +81,6 @@ declare class Core {
 	get deviceFriendlyName(): string;
 	loadWasm(): Promise<void>;
 	init(): Promise<ConfigResult>;
-}
-declare class CropRectDeletedEvent extends BaseEvent {
-	readonly rect: Rect;
-	static create(rect: Rect): CropRectDeletedEvent;
-	constructor(rect: Rect);
-}
-declare class CropRectDrawnEvent extends BaseEvent {
-	readonly rect: Rect;
-	static create(rect: Rect): CropRectDrawnEvent;
-	constructor(rect: Rect);
-}
-declare class CropRectModifiedEvent extends BaseEvent {
-	readonly oldRect: Rect;
-	readonly newRect: Rect;
-	static create(oldRect: Rect, newRect: Rect): CropRectModifiedEvent;
-	constructor(oldRect: Rect, newRect: Rect);
-}
-declare class CurrentIndexChangedEvent extends BaseEvent {
-	readonly oldIndex: number;
-	readonly newIndex: number;
-	static create(oldIndex: number, newIndex: number): CurrentIndexChangedEvent;
-	constructor(oldIndex: number, newIndex: number);
-}
-declare class CurrentPageChangedEvent extends BaseEvent {
-	readonly oldPageUid: string;
-	readonly newPageUid: string;
-	static create(oldPageUid: string, newPageUid: string): CurrentPageChangedEvent;
-	constructor(oldPageUid: string, newPageUid: string);
-}
-declare class DisplayModeChangedEvent extends BaseEvent {
-	readonly oldDisplayMode: DisplayModeEnum;
-	readonly newDisplayMode: DisplayModeEnum;
-	static create(oldDisplayMode: DisplayModeEnum, newDisplayMode: DisplayModeEnum): DisplayModeChangedEvent;
-	constructor(oldDisplayMode: DisplayModeEnum, newDisplayMode: DisplayModeEnum);
 }
 declare class Disposable implements IDisposable {
 	private store;
@@ -144,12 +103,6 @@ declare class DocumentDetect implements IDocumentDetect {
 	calculateTotalConfidence(conf: DocumentDetectConfidence): number;
 	reset(): void;
 }
-declare class DocumentEvent extends BaseEvent {
-	readonly docUid: string;
-	readonly docName: string;
-	static create(docUid: string, docName: string): DocumentEvent;
-	constructor(docUid: string, docName: string);
-}
 declare class DocumentManager extends Disposable {
 	#private;
 	constructor();
@@ -164,7 +117,7 @@ declare class DocumentManager extends Disposable {
 	 * @param docUid - The uid of the target document.
 	 * @returns The target document object.
 	 */
-	getDocument(docUid: string): IDocument;
+	getDocument(docUid: string): IDocument | null;
 	getAllDocuments(): IDocument[];
 	/**
 	 * Remove the documents specified by the document uids.
@@ -255,12 +208,6 @@ declare class Ellipse extends BaseAnnotation<EllipseAnnotationOptions> {
 	constructor(options?: EllipseAnnotationOptions);
 	get type(): string;
 }
-declare class FitModeChangedEvent extends BaseEvent {
-	readonly oldFitMode: FitModeEnum;
-	readonly newFitMode: FitModeEnum;
-	static create(oldFitMode: FitModeEnum, newFitMode: FitModeEnum): FitModeChangedEvent;
-	constructor(oldFitMode: FitModeEnum, newFitMode: FitModeEnum);
-}
 declare class ImageFilter implements IImageFilter {
 	#private;
 	get defaultFilterType(): string;
@@ -278,9 +225,13 @@ declare class ImageIOWasmEnv {
 		retryDelay: number;
 	};
 	static enableSimd: boolean;
+	static enableWasmCompression: boolean;
 	static get isApple(): boolean;
 	static get version(): string;
 	static enableDebugOutput(enable: boolean, callback: (...args: any) => void): void;
+	static hasDebugOutput(): boolean;
+	static get blobReadModeSettings(): BlobReadModeSettings;
+	static set blobReadModeSettings(value: BlobReadModeSettings);
 	static getMemoryUsed(): any;
 	static get heapConfig(): any;
 	static updateHeapConfig(workerName: WorkerName, maxHeapSize?: number, initHeapSize?: number): void;
@@ -309,6 +260,8 @@ declare class Incomplete {
 	get type(): string;
 	get pageUid(): string;
 	get raw(): any;
+	get flattened(): boolean;
+	set flattened(value: boolean);
 }
 declare class Ink extends BaseAnnotation<InkAnnotationOptions> {
 	constructor(options?: InkAnnotationOptions);
@@ -317,26 +270,6 @@ declare class Ink extends BaseAnnotation<InkAnnotationOptions> {
 declare class Line extends BaseAnnotation<LineAnnotationOptions> {
 	constructor(options?: LineAnnotationOptions);
 	get type(): string;
-}
-declare class PageRenderedEvent extends BaseEvent {
-	readonly index: number;
-	readonly pageUid: string;
-	static create(index: number, pageUid: string): PageRenderedEvent;
-	constructor(index: number, pageUid: string);
-}
-declare class PagesAddedEvent extends BaseEvent {
-	readonly docUid: string;
-	readonly indices: number[];
-	readonly pageUids: string[];
-	static create(docUid: string, indices: number[], pageUids: string[]): PagesAddedEvent;
-	constructor(docUid: string, indices: number[], pageUids: string[]);
-}
-declare class PagesDeletedEvent extends BaseEvent {
-	readonly docUid: string;
-	readonly pageUids: string[];
-	readonly indices: number[];
-	static create(docUid: string, pageUids: string[], indices: number[]): PagesDeletedEvent;
-	constructor(docUid: string, pageUids: string[], indices: number[]);
 }
 declare class PagesDraggedEvent extends BaseEvent {
 	readonly indices: number[];
@@ -351,21 +284,6 @@ declare class PagesDroppedEvent extends BaseEvent {
 	static create(indicesBefore: number[], indicesAfter: number[], pageUids: string[]): PagesDroppedEvent;
 	constructor(indicesBefore: number[], indicesAfter: number[], pageUids: string[]);
 }
-declare class PlayedEvent extends BaseEvent {
-	readonly deviceId: string;
-	readonly resolution: [
-		number,
-		number
-	];
-	static create(deviceId: string, resolution: [
-		number,
-		number
-	]): PlayedEvent;
-	constructor(deviceId: string, resolution: [
-		number,
-		number
-	]);
-}
 declare class Polygon extends BaseAnnotation<PolygonAnnotationOptions> {
 	constructor(options?: PolygonAnnotationOptions);
 	get type(): string;
@@ -374,37 +292,9 @@ declare class Polyline extends BaseAnnotation<PolylineAnnotationOptions> {
 	constructor(options?: PolylineAnnotationOptions);
 	get type(): string;
 }
-declare class QuadModifiedEvent extends BaseEvent {
-	readonly oldQuad: Quad;
-	readonly newQuad: Quad;
-	static create(oldQuad: Quad, newQuad: Quad): QuadModifiedEvent;
-	constructor(oldQuad: Quad, newQuad: Quad);
-}
 declare class Rectangle extends BaseAnnotation<RectAnnotationOptions> {
 	constructor(options?: RectAnnotationOptions);
 	get type(): string;
-}
-declare class ResizedEvent extends BaseEvent {
-	readonly oldWidth: number;
-	readonly oldHeight: number;
-	readonly newWidth: number;
-	readonly newHeight: number;
-	static create(oldWidth: number, oldHeight: number, newWidth: number, newHeight: number): ResizedEvent;
-	constructor(oldWidth: number, oldHeight: number, newWidth: number, newHeight: number);
-}
-declare class SelectedAnnotationsChangedEvent extends BaseEvent {
-	readonly oldAnnotationUids: string[];
-	readonly newAnnotationUids: string[];
-	static create(oldAnnotationUids: string[], newAnnotationUids: string[]): SelectedAnnotationsChangedEvent;
-	constructor(oldAnnotationUids: string[], newAnnotationUids: string[]);
-}
-declare class SelectedPagesChangedEvent extends BaseEvent {
-	readonly oldIndices: number[];
-	readonly newIndices: number[];
-	readonly oldPageUids: string[];
-	readonly newPageUids: string[];
-	static create(oldIndices: number[], newIndices: number[], oldPageUids: string[], newPageUids: string[]): SelectedPagesChangedEvent;
-	constructor(oldIndices: number[], newIndices: number[], oldPageUids: string[], newPageUids: string[]);
 }
 declare class Stamp {
 	#private;
@@ -414,13 +304,10 @@ declare class Stamp {
 	constructor(options?: StampAnnotationOptions);
 	get type(): AnnotationTypesEnum;
 	get pageUid(): string;
+	get flattened(): boolean;
+	set flattened(value: boolean);
 	getOptions(): StampAnnotationOptions;
 	updateOptions(options: StampAnnotationOptions): Promise<void>;
-}
-declare class StoppedEvent extends BaseEvent {
-	readonly deviceId: string;
-	static create(deviceId: string): StoppedEvent;
-	constructor(deviceId: string);
 }
 declare class TextBox extends BaseAnnotation<TextBoxAnnotationOptions> {
 	constructor(options?: TextBoxAnnotationOptions);
@@ -430,12 +317,6 @@ declare class TextTypewriter extends BaseAnnotation<TextTypewriterAnnotationOpti
 	constructor(options?: TextTypewriterAnnotationOptions);
 	get type(): string;
 }
-declare class ToolModeChangedEvent extends BaseEvent {
-	readonly oldToolMode: ToolModeEnum;
-	readonly newToolMode: ToolModeEnum;
-	static create(oldToolMode: ToolModeEnum, newToolMode: ToolModeEnum): ToolModeChangedEvent;
-	constructor(oldToolMode: ToolModeEnum, newToolMode: ToolModeEnum);
-}
 declare class Unknown {
 	uid: string;
 	creationDate: string;
@@ -443,17 +324,8 @@ declare class Unknown {
 	constructor();
 	get type(): string;
 	get pageUid(): string;
-}
-declare class VPointerEvent extends BaseEvent {
-	readonly index: number;
-	readonly pageUid: string;
-	readonly imageX: number;
-	readonly imageY: number;
-	readonly canvasX: number;
-	readonly canvasY: number;
-	readonly nativeEvent: PointerEvent;
-	static create(index: number, pageUid: string, imageX: number, imageY: number, canvasX: number, canvasY: number, nativeEvent: PointerEvent): VPointerEvent;
-	constructor(index: number, pageUid: string, imageX: number, imageY: number, canvasX: number, canvasY: number, nativeEvent: PointerEvent);
+	get flattened(): boolean;
+	set flattened(value: boolean);
 }
 declare class ViewerCommon {
 	getIsBoundContainer(viewer: Viewer): any;
@@ -481,25 +353,7 @@ declare class ViewerCommon {
 	off<K extends keyof ViewerEventMap>(viewer: Viewer, apiName: string, eventName: K, listener?: (event: ViewerEventMap[K]) => any): void;
 	destroy(viewer: Viewer): void;
 }
-declare class ZoomChangedEvent extends BaseEvent {
-	readonly oldZoomRatio: number;
-	readonly newZoomRatio: number;
-	static create(oldZoomRatio: number, newZoomRatio: number): ZoomChangedEvent;
-	constructor(oldZoomRatio: number, newZoomRatio: number);
-}
 declare const Version: string;
-declare enum EnumImageFilterType {
-	NONE = "none",
-	BLACK_AND_WHITE = "blackAndWhite",
-	GRAY = "gray",
-	REMOVE_SHADOW = "removeShadow",
-	SAVE_INK = "saveInk",
-	ENHANCE = "enhance",
-	INVERT = "invert",
-	BRIGHTNESS = "brightness",
-	CONTRAST = "contrast",
-	BRIGHTNESS_AND_CONTRAST = "brightnessAndContrast"
-}
 declare enum EnumLineEnding {
 	NONE = "none",
 	OPEN = "open",
@@ -620,7 +474,9 @@ export declare class CaptureViewer {
 	];
 	turnOnTorch(): Promise<void>;
 	turnOffTorch(): Promise<void>;
+	on(eventName: string, listener: (...args: any[]) => void): void;
 	on<K extends keyof CaptureViewerEventMap>(eventName: K, listener: (event: CaptureViewerEventMap[K]) => any): void;
+	off(eventName: string, listener: (...args: any[]) => void): void;
 	off<K extends keyof CaptureViewerEventMap>(eventName: K, listener?: (event: CaptureViewerEventMap[K]) => any): void;
 	destroy(): void;
 }
@@ -733,9 +589,12 @@ export declare class EditViewer {
 	goToPage(index: number): number;
 	selectAnnotations(annotationUids: string[]): boolean;
 	getSelectedAnnotations(): (Incomplete | Unknown | OuterAnnotation)[];
+	on(eventName: string, listener: (...args: any[]) => void): void;
 	on<K extends keyof EditViewerEventMap>(eventName: K, listener: (event: EditViewerEventMap[K]) => any): void;
+	off(eventName: string, listener: (...args: any[]) => void): void;
 	off<K extends keyof EditViewerEventMap>(eventName: K, listener?: (event: EditViewerEventMap[K]) => any): void;
 	destroy(): void;
+	setAnnotationDrawingStyle(config: AnnotationDrawingStyleConfig): boolean;
 }
 export declare class PerspectiveViewer {
 	#private;
@@ -796,7 +655,9 @@ export declare class PerspectiveViewer {
 	 */
 	getCurrentPageIndex(): number;
 	getPageCount(): number;
-	on<K extends keyof PerspectiveViewerEventMap>(eventName: K, listener: (eventName: PerspectiveViewerEventMap[K]) => any): void;
+	on(eventName: string, listener: (...args: any[]) => void): void;
+	on<K extends keyof PerspectiveViewerEventMap>(eventName: K, listener: (event: PerspectiveViewerEventMap[K]) => any): void;
+	off(eventName: string, listener: (...args: any[]) => void): void;
 	off<K extends keyof PerspectiveViewerEventMap>(eventName: K, listener?: (event: PerspectiveViewerEventMap[K]) => any): void;
 	destroy(): void;
 }
@@ -845,7 +706,7 @@ export declare const DDV: {
 	 * @param listener - The listener function.
 	 * @template K - The type of the event name.
 	 */
-	on<K extends keyof DDVEventMap>(eventName: K, listener: (event: DDVEventMap[K]) => any): void;
+	on<J extends keyof InfoDetailsMap, K extends keyof DDVEventMap<J>>(eventName: K, listener: (event: DDVEventMap<J>[K]) => any): void;
 	/**
 	 * Unregister an event listener from the DDV system.
 	 * @param eventName - The name of the event.
@@ -853,7 +714,7 @@ export declare const DDV: {
 	 * If listener is not provided, all listeners of the event will be removed.
 	 * @template K - The type of the event name.
 	 */
-	off<K extends keyof DDVEventMap>(eventName: K, listener?: (event: DDVEventMap[K]) => any): void;
+	off<J extends keyof InfoDetailsMap, K extends keyof DDVEventMap<J>>(eventName: K, listener?: (event: DDVEventMap<J>[K]) => any): void;
 	/** Enums */
 	EnumImageDataType: typeof EnumImageDataType;
 	EnumConvertMode: typeof EnumConvertMode;
@@ -868,26 +729,6 @@ export declare const DDV: {
 	/** Annotations */
 	annotationManager: AnnotationManager;
 };
-export declare const enum AnnotationTypesEnum {
-	ARC = "arc",
-	CIRCLE = "circle",
-	IMAGE = "image",
-	TEXT_ASSIST = "textAssist",
-	ELLIPSE = "ellipse",
-	RECT = "rectangle",
-	LINE = "line",
-	POLYGON = "polygon",
-	POLYLINE = "polyline",
-	TEXT_TYPEWRITER = "textTypewriter",
-	TEXT_BOX = "textBox",
-	INK = "ink",
-	STAMP = "stamp",
-	HIGHLIGHT = "highlight",
-	UNDERLINE = "underline",
-	STRIKEOUT = "strikeout",
-	INCOMPLETE = "incomplete",
-	UNKNOWN = "unknown"
-}
 export declare const enum AnnotationTypesEnum {
 	ARC = "arc",
 	CIRCLE = "circle",
@@ -1022,17 +863,18 @@ export interface AnnotationConfig {
 	/** Whether to show the selected annotation on top level. Default value: true */
 	showOnTopWhenSelected?: boolean;
 	enableContinuousDrawing?: boolean;
-	defaultStyleConfig?: {
-		rectangle?: RectangleStyle;
-		ellipse?: EllipseStyle;
-		polygon?: PolygonStyle;
-		polyline?: PolylineStyle;
-		line?: LineStyle;
-		ink?: InkStyle;
-		textBox?: TextBoxStyle;
-		textTypewriter?: TextTypewriterStyle;
-		stamp?: StampStyle;
-	};
+	defaultStyleConfig?: AnnotationDrawingStyleConfig;
+}
+export interface AnnotationDrawingStyleConfig {
+	rectangle?: RectangleStyle;
+	ellipse?: EllipseStyle;
+	polygon?: PolygonStyle;
+	polyline?: PolylineStyle;
+	line?: LineStyle;
+	ink?: InkStyle;
+	textBox?: TextBoxStyle;
+	textTypewriter?: TextTypewriterStyle;
+	stamp?: StampStyle;
 }
 export interface AnnotationLayerChangedEvent {
 	oldAnnotationUidList: string[];
@@ -1086,6 +928,7 @@ export interface AnnotationRawData {
 	icon?: string;
 	state?: string;
 	statemodel?: string;
+	customData?: any;
 	defaultAppearanceData?: {
 		fontColor?: number[];
 		fontName?: string;
@@ -1122,12 +965,12 @@ export interface AnnotationStyle extends AnnotationCommonStyle {
 	fontWeight?: string;
 	textBaseLine?: string;
 	img?: HTMLImageElement;
-	startPoint?: Point3Init;
-	endPoint?: Point3Init;
+	startPoint?: Point2Init;
+	endPoint?: Point2Init;
 	lineEnding?: string[];
-	points?: Point3Init[];
+	points?: Point2Init[];
 	textContents?: FreeTextContent[];
-	segments?: Point3Init[][];
+	segments?: Point2Init[][];
 	imageData?: string | Blob;
 	stampConfig?: any[];
 	annotationRaw?: AnnotationRawData;
@@ -1143,9 +986,9 @@ export interface AnnotationToolbarButton {
 	displayText?: string;
 }
 export interface AnnotationTransform {
-	scale: Vector3Init;
+	scale: Vector2Init;
 	angle: number;
-	position?: Point3Init;
+	position?: Point2Init;
 }
 export interface AnnotationsAddedEvent {
 	annotationUids: string[];
@@ -1225,6 +1068,11 @@ export interface BaseStyle {
 	border?: string;
 	background?: string;
 }
+export interface BlobReadModeSettings {
+	minBlobSize?: number;
+	fontForLoad?: boolean;
+	fontForSave?: boolean;
+}
 export interface BrowseViewerConfig {
 	canvasStyle?: CanvasStyle;
 	currentPageStyle?: BaseStyle;
@@ -1240,10 +1088,12 @@ export interface BrowseViewerConfig {
 	multiselectMode?: boolean;
 	scrollToLatest?: boolean;
 	enableDragPage?: boolean;
+	enableLoadSourceByDrag?: boolean;
 }
 export interface BrowseViewerConstructorOptions {
 	container?: string | HTMLElement;
 	viewerConfig?: BrowseViewerConfig;
+	keyboardInteractionConfig?: KeyBoardInteractionConfig;
 	uiConfig?: UiConfig;
 	/** The uid of the controller/viewer to be synced */
 	groupUid?: string;
@@ -1351,10 +1201,11 @@ export interface DDVError {
 	message: string;
 	cause: VError;
 }
-export interface DDVEventMap {
+export interface DDVEventMap<J extends keyof InfoDetailsMap> {
 	"error": DDVError;
 	"warning": DDVError;
 	"verbose": DDVError;
+	"info": InfoObject<J>;
 }
 export interface DDVVersionInfo {
 	viewer?: typeof Version;
@@ -1434,11 +1285,14 @@ export interface EditViewerConfig {
 	scrollDirection?: "horizontal" | "vertical";
 	enableSlide?: boolean;
 	scrollToLatest?: boolean;
+	enableMagnifier?: boolean;
+	enableLoadSourceByDrag?: boolean;
 }
 export interface EditViewerConstructorOptions {
 	container?: string | HTMLElement;
 	viewerConfig?: EditViewerConfig;
 	thumbnailConfig?: ThumbnailConfig;
+	keyboardInteractionConfig?: KeyBoardInteractionConfig;
 	uiConfig?: UiConfig;
 	/** The uid of the controller/viewer to be synced */
 	groupUid?: string;
@@ -1478,6 +1332,10 @@ export interface ExtraPageData {
 export interface FileParserConstructor {
 	new (): IFileParser;
 }
+export interface FilterInfo {
+	pageUid: string;
+	filterType: string;
+}
 export interface FilterInputOptions {
 	brightness?: number;
 	contrast?: number;
@@ -1491,6 +1349,9 @@ export interface Flags {
 	print?: boolean;
 	noView?: boolean;
 	readOnly?: boolean;
+	noResize?: boolean;
+	noRotate?: boolean;
+	noMove?: boolean;
 }
 export interface FreeTextContent extends FreeTextContentProps {
 	fontSize?: string | number;
@@ -1572,6 +1433,7 @@ export interface IFileParser {
 	once: boolean;
 	initParser(source: Blob, parserOptions?: ParserOptions): void;
 	getPageCount(): Promise<number>;
+	parseAnnotations(indices: number[], parsedPages: ParsedPage[]): Promise<ParsedAnnotationPage[]>;
 	parse(indices?: number[]): Promise<ParsedPage[]>;
 	getPage(index?: number): Promise<ParsedPage>;
 	cancelGetPage(index?: number): void;
@@ -1654,12 +1516,39 @@ export interface ImageFilterItem {
 	type: string;
 	label: string;
 }
+export interface InfoDetailsMap {
+	"init": InitInfo;
+	"loadSource": LoadSourceInfo;
+	"save": SaveSourceInfo;
+	"filter": FilterInfo;
+	"perspective": PerspectiveInfo;
+	"loadWasm": LoadWasmInfo;
+}
+export interface InfoObject<K extends keyof InfoDetailsMap> {
+	id: number;
+	type: K;
+	status: InfoStatus;
+	timestamp: number;
+	details?: InfoDetailsMap[K];
+}
+export interface InitInfo {
+}
 export interface InkAnnotationOptions extends Omit<BaseAnnotationOptions, "background" | "lineDash"> {
 	points?: Point[][];
 }
 export interface InkStyle extends BaseAnnotationStyle {
 	borderWidth?: number;
 	borderColor?: string;
+}
+export interface KeyBoardInteractionConfig {
+	enableZoom?: boolean;
+	enableUndoRedo?: boolean;
+	enableAnnotationClipboard?: boolean;
+	enableMultipleAnnotationsSelection?: boolean;
+	enableMultiplePagesSelection?: boolean;
+	enableMoveAnnotation?: boolean;
+	enableDeleteAnnotation?: boolean;
+	enablePageNavigation?: boolean;
 }
 export interface LastError {
 	message: string;
@@ -1685,10 +1574,17 @@ export interface LineEnding {
 }
 export interface LineStyle extends PolylineStyle {
 }
+export interface LoadSourceInfo {
+	docUid: string;
+	current: number;
+	total: number;
+}
 export interface LoadSourceOptions {
 	insertBeforeIndex?: number;
 	/** Whether ignore the exception while loading the source. */
 	exception?: ExceptionType;
+}
+export interface LoadWasmInfo {
 }
 export interface MergeDocumentsOptions {
 	name?: string;
@@ -1798,6 +1694,7 @@ export interface PagesDeletedEvent {
 	readonly indices: number[];
 }
 export interface PaletteConfig {
+	enabled?: boolean;
 	id?: string;
 	style?: Partial<CSSStyleDeclaration>;
 	className?: string;
@@ -1824,6 +1721,11 @@ export interface ParsedAnnotation {
 }
 export interface ParsedAnnotationComment extends ParsedAnnotationReply {
 	replies?: ParsedAnnotationReply[];
+}
+export interface ParsedAnnotationPage {
+	pageUid: string;
+	fileIndex: number;
+	annotations: ParsedAnnotation[];
 }
 export interface ParsedAnnotationReply {
 	uid: string;
@@ -1860,6 +1762,9 @@ export interface ParsedPage {
 	cropBox: Rect;
 	resource: ParsedImageResource;
 	pdfOptions?: ParsedPagePdfOptions;
+	realReadMode?: number;
+	nativeMediaBox?: Rect;
+	nativeCropBox?: Rect;
 }
 export interface ParsedPagePdfOptions {
 	convertMode: EnumConvertMode;
@@ -1867,6 +1772,11 @@ export interface ParsedPagePdfOptions {
 		renderAnnotations: EnumAnnotationRenderMode;
 		renderGrayscale: boolean;
 	};
+	rotation: number;
+	mediaBox: Rect;
+	cropBox: Rect;
+	annotCount: number;
+	pageContentType?: string;
 }
 export interface ParserOptions {
 	pageWidth?: number;
@@ -1883,12 +1793,18 @@ export interface PdfSource extends Source {
 		renderGrayscale?: boolean;
 	};
 }
+export interface PerspectiveInfo {
+	pageUid: string;
+	perspectiveQuad: Quad;
+}
 export interface PerspectiveViewerConfig {
 	canvasStyle?: CanvasStyle;
 	pageStyle?: BaseStyle;
 	quadSelectionStyle?: QuadSelectionStyle;
 	enableSlide?: boolean;
 	scrollToLatest?: boolean;
+	enableMagnifier?: boolean;
+	enableLoadSourceByDrag?: boolean;
 }
 export interface PerspectiveViewerConstructorOptions {
 	container?: string | HTMLElement;
@@ -1923,10 +1839,9 @@ export interface Point {
 	x: number;
 	y: number;
 }
-export interface Point3Init {
+export interface Point2Init {
 	x: number;
 	y: number;
-	z?: number;
 }
 export interface PolygonAnnotationOptions extends Omit<BaseAnnotationOptions, "rotation"> {
 	points?: Point[];
@@ -1990,7 +1905,6 @@ export interface RectAnnotationOptions extends BaseAnnotationOptions {
 	height?: number;
 }
 export interface RectangleStyle extends BaseAnnotationStyle {
-	opacity?: number;
 	borderWidth?: number;
 	borderColor?: string;
 	background?: string;
@@ -2074,6 +1988,12 @@ export interface SavePdfSettings {
 export interface SavePngSettings {
 	saveAnnotation?: boolean;
 }
+export interface SaveSourceInfo {
+	docUid: string;
+	pageUids: string[];
+	current: number;
+	total: number;
+}
 export interface SaveTiffSettings {
 	customTag?: TiffCustomTag[];
 	/**
@@ -2107,7 +2027,7 @@ export interface StampAnnotationOptions {
 	y?: number;
 	width?: number;
 	height?: number;
-	stamp?: EnumStampIcon | string | Blob;
+	stamp?: EnumStampIcon | string | Blob | object[];
 	opacity?: number;
 	flags?: Flags;
 	rotation?: number;
@@ -2167,6 +2087,7 @@ export interface ToolModeChangedEvent {
 	readonly newToolMode: ToolModeEnum;
 }
 export interface ToolbarConfig {
+	enabled?: boolean;
 	id?: string;
 	className?: string;
 	style?: Partial<CSSStyleDeclaration>;
@@ -2223,10 +2144,9 @@ export interface VPointerEvent {
 	readonly canvasY: number;
 	readonly nativeEvent: PointerEvent;
 }
-export interface Vector3Init {
+export interface Vector2Init {
 	x: number;
 	y: number;
-	z?: number;
 }
 export interface VideoConfig {
 	resolution?: [
@@ -2290,6 +2210,7 @@ export type DisplayMode = "single" | "continuous";
 export type ExceptionType = "fail" | "ignore";
 export type FitMode = "width" | "height" | "window" | "actualSize";
 export type FreeTextAlign = "left" | "right" | "center" | "justify";
+export type InfoStatus = "Pending" | "InProgress" | "Completed" | "Failed" | "Canceled";
 export type OuterAnnotation = Rectangle | Ellipse | Ink | Line | Polygon | Polyline | Stamp | TextBox | TextTypewriter;
 export type Quad = [
 	[

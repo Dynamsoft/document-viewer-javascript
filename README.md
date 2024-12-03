@@ -1,7 +1,7 @@
 # Dynamsoft Document Viewer
 
 ![version](https://img.shields.io/npm/v/dynamsoft-document-viewer.svg)
-![downloads](https://img.shields.io/npm/dm/dynamsoft-document-viewersvg) 
+![downloads](https://img.shields.io/npm/dm/dynamsoft-document-viewer.svg) 
 ![jsdelivr](https://img.shields.io/jsdelivr/npm/hm/dynamsoft-document-viewer.svg)
 
 [Dynamsoft Document Viewer (DDV)](https://www.dynamsoft.com/document-viewer/docs/introduction/index.html) is a browser-based JavaScript SDK designed for viewing and editing images and PDFs. It provides a wide range of functionalities, including PDF annotation, page manipulation, image quality enhancement, and document saving.
@@ -13,7 +13,7 @@ Dynamsoft Document Viewer is independently developed and does not rely on any ex
 Dynamsoft Document Viewer is designed to work seamlessly across different browsers and platforms. It is compatible with major browsers like Chrome, Firefox, Safari, and Edge, ensuring a consistent user experience. Additionally, it supports various operating systems, including Windows, macOS, Linux, iOS, and Android, allowing users to access documents from any device.
 
 #### Supported File Types
-Users can open, edit, and save PDFs, as well as various image formats such as JPEG, PNG, BMP, TIFF, and GIF.
+Users can open, edit, and save PDFs, as well as various image formats such as JPEG, PNG, and TIFF.
 
 #### Annotation Types
 Dynamsoft Document Viewer supports a variety of annotation types to enhance document interaction and collaboration. Users can add, edit, and delete annotations such as:
