@@ -19,6 +19,7 @@ declare class BaseAnnotation<T> {
 	creationDate: string;
 	modificationDate: string;
 	constructor(options: T);
+	get source(): "user" | "file" | "api" | "";
 	get type(): string;
 	get pageUid(): string;
 	get flattened(): boolean;
@@ -66,9 +67,7 @@ declare class BaseBrowseViewer implements IBrowseViewer {
 	on<K extends keyof BrowseViewerEventMap>(eventName: K, listener: (event: BrowseViewerEventMap[K]) => any): void;
 	off(eventName: string, listener: (...args: any[]) => void): void;
 	off<K extends keyof BrowseViewerEventMap>(eventName: K, listener?: (event: BrowseViewerEventMap[K]) => any): void;
-}
-declare class BaseEvent implements IDomainEvent {
-	constructor(type: string);
+	getVisiblePagesInfo(): PageVisualInfo[];
 }
 declare class Core {
 	#private;
@@ -117,7 +116,7 @@ declare class DocumentManager extends Disposable {
 	 * @param docUid - The uid of the target document.
 	 * @returns The target document object.
 	 */
-	getDocument(docUid: string): IDocument | null;
+	getDocument(docUid: string): IDocument;
 	getAllDocuments(): IDocument[];
 	/**
 	 * Remove the documents specified by the document uids.
@@ -203,15 +202,26 @@ declare class Elements {
 	static get BringToFront(): string;
 	static get SendBackward(): string;
 	static get SendToBack(): string;
+	static get HighlightAnnotation(): string;
+	static get UnderlineAnnotation(): string;
+	static get StrikeoutAnnotation(): string;
+	static get TextSelectionMode(): string;
+	static get TextSearchPanel(): string;
+	static get TextSearchPanelSwitch(): string;
 }
 declare class Ellipse extends BaseAnnotation<EllipseAnnotationOptions> {
 	constructor(options?: EllipseAnnotationOptions);
 	get type(): string;
 }
+declare class Highlight extends BaseAnnotation<HighlightAnnotationOptions> {
+	constructor(options?: HighlightAnnotationOptions);
+	get type(): string;
+	updateOptions(options: HighlightAnnotationOptions): boolean;
+}
 declare class ImageFilter implements IImageFilter {
 	#private;
 	get defaultFilterType(): string;
-	applyFilter(image: VImageData, type: EnumImageFilterType, filterInputOptions?: FilterInputOptions, outputOptions?: ProcessOutputOptions): Promise<Blob>;
+	applyFilter(image: VImageData, type: EnumImageFilterTypeInternal, filterInputOptions?: FilterInputOptions, outputOptions?: ProcessOutputOptions): Promise<Blob>;
 	querySupported(): ImageFilterItem[];
 	destroy(): void;
 }
@@ -257,6 +267,7 @@ declare class Incomplete {
 	creationDate: string;
 	modificationDate: string;
 	constructor(raw: any);
+	get source(): "user" | "file" | "api" | "";
 	get type(): string;
 	get pageUid(): string;
 	get raw(): any;
@@ -270,27 +281,17 @@ declare class Ink extends BaseAnnotation<InkAnnotationOptions> {
 declare class Line extends BaseAnnotation<LineAnnotationOptions> {
 	constructor(options?: LineAnnotationOptions);
 	get type(): string;
-}
-declare class PagesDraggedEvent extends BaseEvent {
-	readonly indices: number[];
-	readonly pageUids: string[];
-	static create(indices: number[], pageUids: string[]): PagesDraggedEvent;
-	constructor(indices: number[], pageUids: string[]);
-}
-declare class PagesDroppedEvent extends BaseEvent {
-	readonly indicesBefore: number[];
-	readonly indicesAfter: number[];
-	readonly pageUids: string[];
-	static create(indicesBefore: number[], indicesAfter: number[], pageUids: string[]): PagesDroppedEvent;
-	constructor(indicesBefore: number[], indicesAfter: number[], pageUids: string[]);
+	updateOptions(options: LineAnnotationOptions): boolean;
 }
 declare class Polygon extends BaseAnnotation<PolygonAnnotationOptions> {
 	constructor(options?: PolygonAnnotationOptions);
 	get type(): string;
+	updateOptions(options: PolygonAnnotationOptions): boolean;
 }
 declare class Polyline extends BaseAnnotation<PolylineAnnotationOptions> {
 	constructor(options?: PolylineAnnotationOptions);
 	get type(): string;
+	updateOptions(options: PolylineAnnotationOptions): boolean;
 }
 declare class Rectangle extends BaseAnnotation<RectAnnotationOptions> {
 	constructor(options?: RectAnnotationOptions);
@@ -302,12 +303,18 @@ declare class Stamp {
 	creationDate: string;
 	modificationDate: string;
 	constructor(options?: StampAnnotationOptions);
+	get source(): "user" | "file" | "api" | "";
 	get type(): AnnotationTypesEnum;
 	get pageUid(): string;
 	get flattened(): boolean;
 	set flattened(value: boolean);
 	getOptions(): StampAnnotationOptions;
 	updateOptions(options: StampAnnotationOptions): Promise<void>;
+}
+declare class Strikeout extends BaseAnnotation<StrikeoutAnnotationOptions> {
+	constructor(options?: StrikeoutAnnotationOptions);
+	get type(): string;
+	updateOptions(options: StrikeoutAnnotationOptions): boolean;
 }
 declare class TextBox extends BaseAnnotation<TextBoxAnnotationOptions> {
 	constructor(options?: TextBoxAnnotationOptions);
@@ -316,12 +323,19 @@ declare class TextBox extends BaseAnnotation<TextBoxAnnotationOptions> {
 declare class TextTypewriter extends BaseAnnotation<TextTypewriterAnnotationOptions> {
 	constructor(options?: TextTypewriterAnnotationOptions);
 	get type(): string;
+	updateOptions(options: TextTypewriterAnnotationOptions): boolean;
+}
+declare class Underline extends BaseAnnotation<UnderlineAnnotationOptions> {
+	constructor(options?: UnderlineAnnotationOptions);
+	get type(): string;
+	updateOptions(options: UnderlineAnnotationOptions): boolean;
 }
 declare class Unknown {
 	uid: string;
 	creationDate: string;
 	modificationDate: string;
 	constructor();
+	get source(): "user" | "file" | "api" | "";
 	get type(): string;
 	get pageUid(): string;
 	get flattened(): boolean;
@@ -349,11 +363,23 @@ declare class ViewerCommon {
 	gotoPage(viewer: Viewer, index: number, apiName: string): any;
 	rotate(viewer: Viewer, angle: number, indices: number[], apiName: string): any;
 	saveOperation(viewer: Viewer): boolean;
-	on<K extends keyof ViewerEventMap>(viewer: Viewer, apiName: string, eventName: K, listener?: (event: ViewerEventMap[K]) => any): void;
-	off<K extends keyof ViewerEventMap>(viewer: Viewer, apiName: string, eventName: K, listener?: (event: ViewerEventMap[K]) => any): void;
+	on(viewer: Viewer, apiName: string, eventName: string, listener?: (event: any) => any): void;
+	off(viewer: Viewer, apiName: string, eventName: string, listener?: (event: any) => any): void;
 	destroy(viewer: Viewer): void;
 }
 declare const Version: string;
+declare enum EnumImageFilterTypeInternal {
+	NONE = "none",
+	BLACK_AND_WHITE = "blackAndWhite",
+	GRAY = "gray",
+	REMOVE_SHADOW = "removeShadow",
+	SAVE_INK = "saveInk",
+	ENHANCE = "enhance",
+	INVERT = "invert",
+	BRIGHTNESS = "brightness",
+	CONTRAST = "contrast",
+	BRIGHTNESS_AND_CONTRAST = "brightnessAndContrast"
+}
 declare enum EnumLineEnding {
 	NONE = "none",
 	OPEN = "open",
@@ -589,12 +615,18 @@ export declare class EditViewer {
 	goToPage(index: number): number;
 	selectAnnotations(annotationUids: string[]): boolean;
 	getSelectedAnnotations(): (Incomplete | Unknown | OuterAnnotation)[];
+	copySelectedTexts(): Promise<void>;
 	on(eventName: string, listener: (...args: any[]) => void): void;
 	on<K extends keyof EditViewerEventMap>(eventName: K, listener: (event: EditViewerEventMap[K]) => any): void;
 	off(eventName: string, listener: (...args: any[]) => void): void;
 	off<K extends keyof EditViewerEventMap>(eventName: K, listener?: (event: EditViewerEventMap[K]) => any): void;
 	destroy(): void;
 	setAnnotationDrawingStyle(config: AnnotationDrawingStyleConfig): boolean;
+	getTextSelection(): ITextSelectedInfo[];
+	searchNextText(text: string, options?: SearchTextOptions): Promise<boolean>;
+	searchPrevText(text: string, options?: SearchTextOptions): Promise<boolean>;
+	searchFullText(text: string, options?: SearchTextOptions): Promise<boolean>;
+	getVisiblePagesInfo(): PageVisualInfo[];
 }
 export declare class PerspectiveViewer {
 	#private;
@@ -660,6 +692,7 @@ export declare class PerspectiveViewer {
 	off(eventName: string, listener: (...args: any[]) => void): void;
 	off<K extends keyof PerspectiveViewerEventMap>(eventName: K, listener?: (event: PerspectiveViewerEventMap[K]) => any): void;
 	destroy(): void;
+	getVisiblePagesInfo(): PageVisualInfo[];
 }
 export declare const DDV: {
 	/** The document manager object */
@@ -687,8 +720,8 @@ export declare const DDV: {
 		get(name: string, params?: any): any;
 		set(name: string, value: any): any;
 	};
-	addFonts(fonts: Blob[]): Promise<void>;
-	getDefaultUiConfig(viewerType: ViewerType, options?: DefaultUiConfigOptions): UiConfig | null;
+	addFonts(fonts: Blob[]): Promise<string[]>;
+	getDefaultUiConfig(viewerType: ViewerType): UiConfig | null;
 	/**
 	 * Set a processing handler to the DDV system.
 	 */
@@ -778,7 +811,8 @@ export declare const enum ToolModeEnum {
 	CROP = "crop",
 	ZOOM_IN = "zoomIn",
 	ZOOM_OUT = "zoomOut",
-	ANNOTATION = "annotation"
+	ANNOTATION = "annotation",
+	TEXT_SELECTION = "textSelection"
 }
 export declare enum EnumAnnotationRenderMode {
 	NO_ANNOTATIONS = "noAnnotations",
@@ -875,6 +909,9 @@ export interface AnnotationDrawingStyleConfig {
 	textBox?: TextBoxStyle;
 	textTypewriter?: TextTypewriterStyle;
 	stamp?: StampStyle;
+	highlight?: HighlightStyle;
+	underline?: UnderlineStyle;
+	strikeout?: StrikeoutStyle;
 }
 export interface AnnotationLayerChangedEvent {
 	oldAnnotationUidList: string[];
@@ -976,11 +1013,12 @@ export interface AnnotationStyle extends AnnotationCommonStyle {
 	annotationRaw?: AnnotationRawData;
 	iconName?: string;
 	renderBlendMode?: string;
+	lines?: Rect[];
 }
 export interface AnnotationToolbarButton {
 	id?: string;
 	className?: string;
-	style?: CSSStyleDeclaration;
+	style?: Partial<CSSStyleDeclaration>;
 	tooltip?: string;
 	label?: string;
 	displayText?: string;
@@ -1036,6 +1074,18 @@ export interface AnnotationsTypeMap {
 	textTypewriter: {
 		options: TextTypewriterAnnotationOptions;
 		return: TextTypewriter;
+	};
+	highlight: {
+		options: HighlightAnnotationOptions;
+		return: Highlight;
+	};
+	underline: {
+		options: UnderlineAnnotationOptions;
+		return: Underline;
+	};
+	strikeout: {
+		options: StrikeoutAnnotationOptions;
+		return: Strikeout;
 	};
 	unknown: {
 		options: any;
@@ -1099,20 +1149,22 @@ export interface BrowseViewerConstructorOptions {
 	groupUid?: string;
 }
 export interface BrowseViewerEventMap {
-	"resized": ResizedEvent;
-	"pageRendered": PageRenderedEvent;
-	"currentIndexChanged": CurrentIndexChangedEvent;
-	"currentPageChanged": CurrentPageChangedEvent;
-	"selectedPagesChanged": SelectedPagesChangedEvent;
-	"pagesDragged": PagesDraggedEvent;
-	"pagesDropped": PagesDroppedEvent;
-	"click": VPointerEvent;
-	"dblclick": VPointerEvent;
-	"rightclick": VPointerEvent;
-}
-export interface CameraChangedEvent {
-	readonly oldDeviceId: string;
-	readonly newDeviceId: string;
+	"resized": IResizedEvent;
+	"pageRendered": IPageRendererEvent;
+	"currentIndexChanged": ICurrentIndexChangedEvent;
+	"currentPageChanged": ICurrentPageChangedEvent;
+	"selectedPagesChanged": ISelectedPagesChangedEvent;
+	"pagesDragged": IPagesDraggedEvent;
+	"pagesDropped": IPagesDroppedEvent;
+	"visibilityChanged": IVisibilityChangedEvent;
+	"click": IPointerEvent;
+	"dblclick": IPointerEvent;
+	"rightclick": IPointerEvent;
+	"pointerdown": IPointerEvent;
+	"pointermove": IPointerEvent;
+	"pointerup": IPointerEvent;
+	"pageover": IPointerEvent;
+	"pageout": IPointerEvent;
 }
 export interface CanvasStyle {
 	border?: string;
@@ -1137,17 +1189,15 @@ export interface CaptureViewerConstructorOptions {
 	groupUid?: string;
 }
 export interface CaptureViewerEventMap {
-	"resized": ResizedEvent;
-	"played": PlayedEvent;
-	"stopped": StoppedEvent;
-	"captured": CapturedEvent;
-	"cameraChanged": CameraChangedEvent;
-	"click": VPointerEvent;
-	"dblclick": VPointerEvent;
-	"rightclick": VPointerEvent;
-}
-export interface CapturedEvent {
-	readonly pageUid: string;
+	"resized": IResizedEvent;
+	"played": ICameraPlayedEvent;
+	"stopped": ICameraStoppedEvent;
+	"captured": ICameraCaptureEvent;
+	"cameraChanged": ICameraChangedEvent;
+	"click": IPointerEvent;
+	"dblclick": IPointerEvent;
+	"rightclick": IPointerEvent;
+	"visibilityChanged": IVisibilityChangedEvent;
 }
 export interface CheckboxStyle {
 	left?: string;
@@ -1175,24 +1225,6 @@ export interface CreateDocumentOptions {
 	author?: string;
 	creationDate?: string;
 }
-export interface CropRectDeletedEvent {
-	readonly rect: Rect;
-}
-export interface CropRectDrawnEvent {
-	readonly rect: Rect;
-}
-export interface CropRectModifiedEvent {
-	readonly oldRect: Rect;
-	readonly newRect: Rect;
-}
-export interface CurrentIndexChangedEvent {
-	readonly oldIndex: number;
-	readonly newIndex: number;
-}
-export interface CurrentPageChangedEvent {
-	readonly oldPageUid: string;
-	readonly newPageUid: string;
-}
 export interface CustomViewerConstructorOptions {
 	container?: HTMLElement | string;
 	uiConfig?: UiConfig;
@@ -1212,19 +1244,12 @@ export interface DDVVersionInfo {
 	build?: string;
 	engine: typeof ImageIOWasmEnv.version;
 }
-export interface DefaultUiConfigOptions {
-	includeAnnotationSet?: boolean;
-}
 export interface DetectResult {
 	location: Quad;
 	width: number;
 	height: number;
 	config: DocumentDetectConfig;
 	confidence?: number;
-}
-export interface DisplayModeChangedEvent {
-	readonly oldDisplayMode: DisplayModeEnum;
-	readonly newDisplayMode: DisplayModeEnum;
 }
 export interface DisplayTextConfig extends IconComponent {
 	FitMode_FitWidth?: string;
@@ -1299,21 +1324,30 @@ export interface EditViewerConstructorOptions {
 	annotationConfig?: AnnotationConfig;
 }
 export interface EditViewerEventMap {
-	"resized": ResizedEvent;
-	"pageRendered": PageRenderedEvent;
-	"currentIndexChanged": CurrentIndexChangedEvent;
-	"currentPageChanged": CurrentPageChangedEvent;
-	"displayModeChanged": DisplayModeChangedEvent;
-	"fitModeChanged": FitModeChangedEvent;
-	"zoomChanged": ZoomChangedEvent;
-	"toolModeChanged": ToolModeChangedEvent;
-	"cropRectDrawn": CropRectDrawnEvent;
-	"cropRectDeleted": CropRectDeletedEvent;
-	"cropRectModified": CropRectModifiedEvent;
-	"click": VPointerEvent;
-	"dblclick": VPointerEvent;
-	"rightclick": VPointerEvent;
-	"selectedAnnotationsChanged": SelectedAnnotationsChangedEvent;
+	"resized": IResizedEvent;
+	"pageRendered": IPageRendererEvent;
+	"currentIndexChanged": ICurrentIndexChangedEvent;
+	"currentPageChanged": ICurrentPageChangedEvent;
+	"displayModeChanged": IDisplayModeChangedEvent;
+	"fitModeChanged": IFitModeChangedEvent;
+	"zoomChanged": IZoomChangedEvent;
+	"toolModeChanged": IToolModeChangedEvent;
+	"selectedAnnotationsChanged": ISelectedAnnotationsChangedEvent;
+	"visibilityChanged": IVisibilityChangedEvent;
+	"cropRectDrawn": ICropRectDrawnEvent;
+	"cropRectDeleted": ICropRectDeletedEvent;
+	"cropRectModified": ICropRectModifiedEvent;
+	"textUnselected": void;
+	"textSelected": ITextSelectedEvent;
+	"textSearchTriggered": ITextSearchTriggeredEvent;
+	"click": IPointerEvent;
+	"dblclick": IPointerEvent;
+	"rightclick": IPointerEvent;
+	"pointerdown": IPointerEvent;
+	"pointermove": IPointerEvent;
+	"pointerup": IPointerEvent;
+	"pageover": IPointerEvent;
+	"pageout": IPointerEvent;
 }
 export interface EllipseAnnotationOptions extends BaseAnnotationOptions {
 	x?: number;
@@ -1322,12 +1356,6 @@ export interface EllipseAnnotationOptions extends BaseAnnotationOptions {
 	height?: number;
 }
 export interface EllipseStyle extends RectangleStyle {
-}
-export interface ExtraPageData {
-	index: number;
-	rotation?: number;
-	filter?: string;
-	perspectiveQuad?: Quad;
 }
 export interface FileParserConstructor {
 	new (): IFileParser;
@@ -1340,10 +1368,6 @@ export interface FilterInputOptions {
 	brightness?: number;
 	contrast?: number;
 	method?: string;
-}
-export interface FitModeChangedEvent {
-	readonly oldFitMode: FitModeEnum;
-	readonly newFitMode: FitModeEnum;
 }
 export interface Flags {
 	print?: boolean;
@@ -1365,6 +1389,12 @@ export interface FreeTextContentProps {
 	fontStyle?: string;
 	fontWeight?: string;
 }
+export interface HighlightAnnotationOptions extends TextAssistAnnotationOptions {
+	background?: string;
+}
+export interface HighlightStyle extends BaseAnnotationStyle {
+	background?: string;
+}
 export interface IBrowseViewer {
 	uid: string;
 	groupUid: string;
@@ -1384,10 +1414,55 @@ export interface IBrowseViewer {
 	setRowAndColumn(rows: number, columns: number): boolean;
 	on<K extends keyof BrowseViewerEventMap>(type: K, listener: (event: BrowseViewerEventMap[K]) => any): void;
 	off<K extends keyof BrowseViewerEventMap>(type: K, listener?: (event: BrowseViewerEventMap[K]) => any): void;
+	getVisiblePagesInfo(): PageVisualInfo[];
+}
+export interface ICameraCaptureEvent {
+	pageUid: string;
+}
+export interface ICameraChangedEvent {
+	oldDeviceId: string;
+	newDeviceId: string;
+}
+export interface ICameraPlayedEvent {
+	deviceId: string;
+	resolution: [
+		number,
+		number
+	];
+}
+export interface ICameraStoppedEvent {
+	deviceId: string;
+}
+export interface ICropRectDeletedEvent {
+	rect: Rect;
+}
+export interface ICropRectDrawnEvent {
+	rect: Rect;
+}
+export interface ICropRectModifiedEvent {
+	oldRect: Rect;
+	newRect: Rect;
+}
+export interface ICurrentIndexChangedEvent {
+	oldIndex: number;
+	newIndex: number;
+}
+export interface ICurrentPageChangedEvent {
+	oldPageUid: string;
+	newPageUid: string;
+}
+export interface IDisplayModeChangedEvent {
+	oldDisplayMode: DisplayModeEnum;
+	newDisplayMode: DisplayModeEnum;
 }
 export interface IDisposable {
 	dispose(): void;
 	register?: <T extends IDisposable>(disposable: T) => T;
+}
+export interface IDocTextSearcher {
+	get docUid(): string;
+	getResults(pageIndex: number): Promise<TextSearchResult[]>;
+	destroy(): void;
 }
 export interface IDocument {
 	get name(): string;
@@ -1398,9 +1473,9 @@ export interface IDocument {
 	loadSource(sources: Source | PdfSource | (Source | PdfSource)[], index?: number): Promise<string[]>;
 	loadSource(fileData: Blob | Blob[], index?: number): Promise<string[]>;
 	loadSource(sources: any, loadSourceOptions?: LoadSourceOptions | number): Promise<string[]>;
-	getPageData(pageUid: string): Promise<PageData>;
+	getPageData(pageUid: string): IPageData;
 	insertBlankPage(pageWidth: number, pageHeight: number, insertBeforeIndex?: number): string;
-	updatePage(pageUid: string, data: Blob, options?: UpdatePageOptions): Promise<boolean>;
+	updatePage(pageUid: string, source: UpdatedSource | UpdatedPdfSource): Promise<boolean>;
 	setPageCustomData(pageUid: string, data: any): Promise<boolean>;
 	getPageCustomData(pageUid: string): Promise<any>;
 	deletePages(indices: number[]): boolean;
@@ -1416,6 +1491,8 @@ export interface IDocument {
 	saveToTiff(indices: number[], saveTIFFSettings?: SaveTiffSettings): Promise<Blob>;
 	print(indices?: number[]): void;
 	print(indices: number[], setting?: PrintSettings): void;
+	isPageModified(index: number): boolean;
+	createTextSearcher(text: string, options?: SearchTextOptions): IDocTextSearcher;
 }
 export interface IDocumentDetect {
 	detect(image: VImageData, config?: DocumentDetectConfig): Promise<DocumentDetectResult>;
@@ -1426,8 +1503,6 @@ export interface IDocumentDetect {
 	reset(): void;
 	destroy(): void;
 }
-export interface IDomainEvent {
-}
 export interface IFileParser {
 	type: string;
 	once: boolean;
@@ -1436,14 +1511,100 @@ export interface IFileParser {
 	parseAnnotations(indices: number[], parsedPages: ParsedPage[]): Promise<ParsedAnnotationPage[]>;
 	parse(indices?: number[]): Promise<ParsedPage[]>;
 	getPage(index?: number): Promise<ParsedPage>;
+	getPageTexts(indices: number[]): Promise<ParsedPageTexts[]>;
 	cancelGetPage(index?: number): void;
 	destroy(): void;
+}
+export interface IFitModeChangedEvent {
+	oldFitMode: FitModeEnum;
+	newFitMode: FitModeEnum;
 }
 export interface IImageFilter {
 	querySupported(): ImageFilterItem[];
 	get defaultFilterType(): string;
 	applyFilter(image: VImageData, type: string): Promise<Blob>;
 	destroy(): void;
+}
+export interface IPageData {
+	get uid(): string;
+	get fileIndex(): number;
+	get filter(): string;
+	get perspectiveQuad(): Quad;
+	get rotation(): number;
+	get mediaBox(): Rect;
+	get cropBox(): Rect;
+	fileData(): Promise<Blob>;
+	raw(): Promise<PageImageInfo>;
+	display(): Promise<PageImageInfo>;
+	thumbnail(): Promise<PageImageInfo>;
+	destroy(): void;
+}
+export interface IPageRendererEvent {
+	index: number;
+	pageUid: string;
+}
+export interface IPagesDraggedEvent {
+	indices: number[];
+	pageUids: string[];
+}
+export interface IPagesDroppedEvent {
+	indicesBefore: number[];
+	indicesAfter: number[];
+	pageUids: string[];
+}
+/**
+ * Support click/dblclick/rightclick/longtap/tap
+ */
+export interface IPointerEvent {
+	index: number;
+	pageUid: string;
+	imageX: number;
+	imageY: number;
+	canvasX: number;
+	canvasY: number;
+	nativeEvent: PointerEvent;
+}
+export interface IQuadModifiedEvent {
+	oldQuad: Quad;
+	newQuad: Quad;
+}
+export interface IResizedEvent {
+	oldWidth: number;
+	oldHeight: number;
+	newWidth: number;
+	newHeight: number;
+}
+export interface ISelectedAnnotationsChangedEvent {
+	newAnnotationUids: string[];
+	oldAnnotationUids: string[];
+}
+export interface ISelectedPagesChangedEvent {
+	oldIndices: number[];
+	newIndices: number[];
+	oldPageUids: string[];
+	newPageUids: string[];
+}
+export interface ITextSearchedInfo {
+	pageUid: string;
+	text: string;
+	rects: RectXY[];
+	context: string;
+}
+export interface ITextSelectedInfo {
+	pageUid: string;
+	text: string;
+	rects: RectXY[];
+}
+export interface IToolModeChangedEvent {
+	oldToolMode: ToolModeEnum;
+	newToolMode: ToolModeEnum;
+}
+export interface IVisibilityChangedEvent {
+	isVisible: boolean;
+}
+export interface IZoomChangedEvent {
+	oldZoomRatio: number;
+	newZoomRatio: number;
 }
 export interface IconComponent {
 	CameraResolution?: string;
@@ -1507,10 +1668,15 @@ export interface IconComponent {
 	TextTypewriterAnnotation?: string;
 	SelectAnnotation?: string;
 	EraseAnnotation?: string;
+	HighlightAnnotation?: string;
+	UnderlineAnnotation?: string;
+	StrikeoutAnnotation?: string;
 	BringForward?: string;
 	BringToFront?: string;
 	SendBackward?: string;
 	SendToBack?: string;
+	TextSearchPanelSwitch?: string;
+	TextSelectionMode?: string;
 }
 export interface ImageFilterItem {
 	type: string;
@@ -1626,39 +1792,10 @@ export interface OBJS {
 	text?: string;
 	wordSpace?: number;
 }
-export interface PageData {
-	uid: string;
-	fileData: Blob;
-	fileIndex?: number;
-	filter?: string;
-	perspectiveQuad?: Quad;
-	rotation?: number;
-	raw?: {
-		width: number;
-		height: number;
-		data: Blob;
-	};
-	thumbnail?: {
-		width: number;
-		height: number;
-		data: Blob;
-	};
-	display?: {
-		width: number;
-		height: number;
-		data: Blob;
-	};
-	mediaBox: Rect;
-	cropBox: Rect;
-}
-export interface PageDraggedEvent {
-	readonly indices: number[];
-	readonly pageUids: string[];
-}
-export interface PageDroppedEvent {
-	readonly indicesBefore: number[];
-	readonly indicesAfter: number[];
-	readonly pageUids: string[];
+export interface PageImageInfo {
+	data: Blob;
+	width: number;
+	height: number;
 }
 export interface PageNumberStyle {
 	onPage?: boolean;
@@ -1679,9 +1816,17 @@ export interface PageNumberStyle {
 	fontSize?: string;
 	fontFamily?: string;
 }
-export interface PageRenderedEvent {
-	readonly index: number;
-	readonly pageUid: string;
+export interface PageVisualInfo {
+	pageUid: string;
+	pageIndex: number;
+	isHovered: boolean;
+	isSelected: boolean;
+	width: number;
+	height: number;
+	canvasOffsetX: number;
+	canvasOffsetY: number;
+	containerOffsetX: number;
+	containerOffsetY: number;
 }
 export interface PagesAddedEvent {
 	readonly docUid: string;
@@ -1718,6 +1863,8 @@ export interface ParsedAnnotation {
 	opacity?: number;
 	flags?: string[];
 	raw?: AnnotationRawData;
+	customData?: any;
+	parsedOriIndex?: number;
 }
 export interface ParsedAnnotationComment extends ParsedAnnotationReply {
 	replies?: ParsedAnnotationReply[];
@@ -1776,7 +1923,24 @@ export interface ParsedPagePdfOptions {
 	mediaBox: Rect;
 	cropBox: Rect;
 	annotCount: number;
+	parsedAnnotCount: number;
 	pageContentType?: string;
+}
+export interface ParsedPageTexts {
+	charInfos: ParsedTextChar[];
+	index: number;
+}
+export interface ParsedTextChar {
+	unicode: number;
+	charBox: Rect;
+	/** The char index in the page texts */
+	oriIndex?: number;
+	/** It will be edited when cropping page. */
+	indexWithWrap?: number;
+	/** It will be edited when cropping page. */
+	indexWithoutWrap?: number;
+	indexInSearch?: number;
+	objId?: string;
 }
 export interface ParserOptions {
 	pageWidth?: number;
@@ -1814,26 +1978,25 @@ export interface PerspectiveViewerConstructorOptions {
 	groupUid?: string;
 }
 export interface PerspectiveViewerEventMap {
-	"resized": ResizedEvent;
-	"pageRendered": PageRenderedEvent;
-	"currentIndexChanged": CurrentIndexChangedEvent;
-	"currentPageChanged": CurrentPageChangedEvent;
-	"quadModified": QuadModifiedEvent;
-	"click": VPointerEvent;
-	"dblclick": VPointerEvent;
-	"rightclick": VPointerEvent;
+	"resized": IResizedEvent;
+	"pageRendered": IPageRendererEvent;
+	"currentIndexChanged": ICurrentIndexChangedEvent;
+	"currentPageChanged": ICurrentPageChangedEvent;
+	"quadModified": IQuadModifiedEvent;
+	"visibilityChanged": IVisibilityChangedEvent;
+	"click": IPointerEvent;
+	"dblclick": IPointerEvent;
+	"rightclick": IPointerEvent;
+	"pointerdown": IPointerEvent;
+	"pointermove": IPointerEvent;
+	"pointerup": IPointerEvent;
+	"pageover": IPointerEvent;
+	"pageout": IPointerEvent;
 }
 export interface PlayCallbackInfo {
 	deviceId: string;
 	width: number;
 	height: number;
-}
-export interface PlayedEvent {
-	readonly deviceId: string;
-	readonly resolution: [
-		number,
-		number
-	];
 }
 export interface Point {
 	x: number;
@@ -1876,10 +2039,6 @@ export interface ProcessingHandlerMap {
 	"documentBoundariesDetect": IDocumentDetect;
 	"imageFilter": IImageFilter;
 }
-export interface QuadModifiedEvent {
-	readonly oldQuad: Quad;
-	readonly newQuad: Quad;
-}
 export interface QuadSelectionStyle {
 	border?: string;
 	background?: string;
@@ -1904,17 +2063,17 @@ export interface RectAnnotationOptions extends BaseAnnotationOptions {
 	width?: number;
 	height?: number;
 }
+export interface RectXY {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+}
 export interface RectangleStyle extends BaseAnnotationStyle {
 	borderWidth?: number;
 	borderColor?: string;
 	background?: string;
 	lineDash?: number[];
-}
-export interface ResizedEvent {
-	readonly oldWidth: number;
-	readonly oldHeight: number;
-	readonly newWidth: number;
-	readonly newHeight: number;
 }
 export interface SaveJpegSettings {
 	quality?: number;
@@ -2008,19 +2167,12 @@ export interface SaveTiffSettings {
 	quality?: number;
 	saveAnnotation?: boolean;
 }
-export interface SelectedAnnotationsChangedEvent {
-	oldAnnotationUids: string[];
-	newAnnotationUids: string[];
-}
-export interface SelectedPagesChangedEvent {
-	readonly oldIndices: number[];
-	readonly newIndices: number[];
-	readonly oldPageUids: string[];
-	readonly newPageUids: string[];
+export interface SearchTextOptions {
+	caseSensitive?: boolean;
+	wholeWord?: boolean;
 }
 export interface Source {
 	fileData: Blob;
-	extraPageData?: ExtraPageData[];
 }
 export interface StampAnnotationOptions {
 	x?: number;
@@ -2035,8 +2187,16 @@ export interface StampAnnotationOptions {
 export interface StampStyle extends BaseAnnotationStyle {
 	stamp?: EnumStampIcon | string | Blob;
 }
-export interface StoppedEvent {
-	readonly deviceId: string;
+export interface StrikeoutAnnotationOptions extends TextAssistAnnotationOptions {
+	borderColor?: string;
+}
+export interface StrikeoutStyle extends BaseAnnotationStyle {
+	borderColor?: string;
+}
+export interface TextAssistAnnotationOptions {
+	rects?: RectXY[];
+	opacity?: number;
+	flags?: Flags;
 }
 export interface TextBoxAnnotationOptions extends BaseAnnotationOptions {
 	x?: number;
@@ -2060,6 +2220,12 @@ export interface TextContent {
 	fontStyle?: string;
 	fontWeight?: string;
 }
+export interface TextSearchResult {
+	pageUid: string;
+	text: string;
+	rects: RectXY[];
+	context: string;
+}
 export interface TextTypewriterAnnotationOptions {
 	x?: number;
 	y?: number;
@@ -2082,10 +2248,6 @@ export interface TiffCustomTag {
 	content?: string;
 	contentIsBase64?: boolean;
 }
-export interface ToolModeChangedEvent {
-	readonly oldToolMode: ToolModeEnum;
-	readonly newToolMode: ToolModeEnum;
-}
 export interface ToolbarConfig {
 	enabled?: boolean;
 	id?: string;
@@ -2093,6 +2255,10 @@ export interface ToolbarConfig {
 	style?: Partial<CSSStyleDeclaration>;
 	paletteButton?: AnnotationToolbarButton;
 	deleteButton?: AnnotationToolbarButton;
+	copyButton?: AnnotationToolbarButton;
+	highlightButton?: AnnotationToolbarButton;
+	underlineButton?: AnnotationToolbarButton;
+	strikeoutButton?: AnnotationToolbarButton;
 }
 export interface Tooltip extends IconComponent {
 }
@@ -2114,11 +2280,26 @@ export interface UiConfig {
 	events?: Partial<Record<keyof GlobalEventHandlersEventMap, any>>;
 	children?: (UiConfig | string)[];
 }
-export interface UpdatePageOptions {
+export interface UnderlineAnnotationOptions extends TextAssistAnnotationOptions {
+	borderColor?: string;
+}
+export interface UnderlineStyle extends BaseAnnotationStyle {
+	borderColor?: string;
+}
+export interface UpdatedPdfSource extends UpdatedSource {
+	convertMode: EnumConvertMode;
+	password?: string;
+	renderOptions?: {
+		renderAnnotations?: EnumAnnotationRenderMode;
+		resolution?: number;
+		maxWidth?: number;
+		maxHeight?: number;
+		renderGrayscale?: boolean;
+	};
+}
+export interface UpdatedSource {
+	fileData: Blob;
 	fileIndex?: number;
-	filter?: string;
-	rotation?: number;
-	perspectiveQuad?: Quad;
 }
 export interface VError {
 	code: number;
@@ -2131,18 +2312,6 @@ export interface VImageData {
 	data: ArrayBuffer | Blob;
 	height?: number;
 	width?: number;
-}
-/**
- * Support click/dblclick/rightclick/longtap/tap
- */
-export interface VPointerEvent {
-	readonly index: number;
-	readonly pageUid: string;
-	readonly imageX: number;
-	readonly imageY: number;
-	readonly canvasX: number;
-	readonly canvasY: number;
-	readonly nativeEvent: PointerEvent;
 }
 export interface Vector2Init {
 	x: number;
@@ -2159,45 +2328,11 @@ export interface VideoDeviceInfo {
 	deviceId: string;
 	label: string;
 }
-export interface ViewerEventMap {
-	cameraChanged: CameraChangedEvent;
-	captured: CapturedEvent;
-	cropRectDeleted: CropRectDeletedEvent;
-	cropRectDrawn: CropRectDrawnEvent;
-	cropRectModified: CropRectModifiedEvent;
-	currentIndexChanged: CurrentIndexChangedEvent;
-	currentPageChanged: CurrentPageChangedEvent;
-	displayModeChanged: DisplayModeChangedEvent;
-	documentCreated: DocumentEvent;
-	fitModeChanged: FitModeChangedEvent;
-	pagesDragged: PagesDraggedEvent;
-	pagesDropped: PagesDroppedEvent;
-	pageRendered: PageRenderedEvent;
-	pagesAdded: PagesAddedEvent;
-	pagesDeleted: PagesDeletedEvent;
-	played: PlayedEvent;
-	quadModified: QuadModifiedEvent;
-	resized: ResizedEvent;
-	selectedPagesChanged: SelectedPagesChangedEvent;
-	stopped: StoppedEvent;
-	toolModeChanged: ToolModeChangedEvent;
-	click: VPointerEvent;
-	dblclick: VPointerEvent;
-	rightclick: VPointerEvent;
-	tap: VPointerEvent;
-	longtap: VPointerEvent;
-	zoomChanged: ZoomChangedEvent;
-	selectedAnnotationsChanged: SelectedAnnotationsChangedEvent;
-}
-export interface ZoomChangedEvent {
-	readonly oldZoomRatio: number;
-	readonly newZoomRatio: number;
-}
 export interface ZoomOrigin {
 	x: "start" | "center" | "end";
 	y: "start" | "center" | "end";
 }
-export type AnnotationMode = "select" | "erase" | "rectangle" | "ellipse" | "line" | "polygon" | "polyline" | "ink" | "textBox" | "textTypewriter" | "stamp";
+export type AnnotationMode = "select" | "erase" | "rectangle" | "ellipse" | "line" | "polygon" | "polyline" | "ink" | "textBox" | "textTypewriter" | "stamp" | "highlight" | "underline" | "strikeout";
 export type AnnotationModifiedAction = "moved" | "resized" | "rotated" | "flagsChanged" | "styleChanged";
 export type BrowseViewerStyle = BaseStyle | CanvasStyle | PageNumberStyle | CheckboxStyle;
 export type BrowseViewerStyleName = "canvasStyle" | "pageStyle" | "selectedPageStyle" | "hoveredPageStyle" | "placeholderStyle" | "pageNumberStyle" | "checkboxStyle" | "currentPageStyle";
@@ -2210,6 +2345,8 @@ export type DisplayMode = "single" | "continuous";
 export type ExceptionType = "fail" | "ignore";
 export type FitMode = "width" | "height" | "window" | "actualSize";
 export type FreeTextAlign = "left" | "right" | "center" | "justify";
+export type ITextSearchTriggeredEvent = ITextSearchedInfo[];
+export type ITextSelectedEvent = ITextSelectedInfo[];
 export type InfoStatus = "Pending" | "InProgress" | "Completed" | "Failed" | "Canceled";
 export type OuterAnnotation = Rectangle | Ellipse | Ink | Line | Polygon | Polyline | Stamp | TextBox | TextTypewriter;
 export type Quad = [
@@ -2230,7 +2367,7 @@ export type Quad = [
 		number
 	]
 ];
-export type ToolMode = "pan" | "crop" | "annotation";
+export type ToolMode = "pan" | "crop" | "annotation" | "textSelection";
 export type Viewer = any;
 export type ViewerType = "editViewer" | "perspectiveViewer" | "captureViewer" | "browseViewer";
 export type WasmModuleName = "core" | "pdf" | "proc";

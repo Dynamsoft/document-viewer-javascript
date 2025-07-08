@@ -4,55 +4,9 @@
 ![downloads](https://img.shields.io/npm/dm/dynamsoft-document-viewer.svg) 
 ![jsdelivr](https://img.shields.io/jsdelivr/npm/hm/dynamsoft-document-viewer.svg)
 
-[Dynamsoft Document Viewer (DDV)](https://www.dynamsoft.com/document-viewer/docs/introduction/index.html) is a browser-based JavaScript SDK designed for viewing and editing images and PDFs. It provides a wide range of functionalities, including PDF annotation, page manipulation, image quality enhancement, and document saving.
-
-#### Security
-Dynamsoft Document Viewer is independently developed and does not rely on any external third-party open-source software. All processing, such as rendering and editing, is securely performed within the browser using a web assembly module. This architecture eliminates the need for a server-side backend, ensuring security compliance and scalability.
-
-####  Browser and Platform Compatibility
-Dynamsoft Document Viewer is designed to work seamlessly across different browsers and platforms. It is compatible with major browsers like Chrome, Firefox, Safari, and Edge, ensuring a consistent user experience. Additionally, it supports various operating systems, including Windows, macOS, Linux, iOS, and Android, allowing users to access documents from any device.
-
-#### Supported File Types
-Users can open, edit, and save PDFs, as well as various image formats such as JPEG, PNG, and TIFF.
-
-#### Annotation Types
-Dynamsoft Document Viewer supports a variety of annotation types to enhance document interaction and collaboration. Users can add, edit, and delete annotations such as:
-
-- text
-- images
-- signature
-- shapes
-- stamps
-- freehand drawings
-
-#### Data Management Concepts
-Dynamsoft Document Viewer organizes data using two main concepts: “document” and “page.” A document can contain one or multiple pages, and each page must belong to a single document.
-
-Page: The smallest unit of data management, currently represented as an image. Each page has a unique pageUid.
-Document: A collection of pages, each with a unique docUid. Documents collectively make up the entire data set.
-Managing data, therefore, involves managing documents and pages.
-
-If you are using the default UI of DDV, data processing and management are handled internally.
-
-#### UI Customization
-The SDK offers extensive customization options, enabling developers to tailor the interface, toolbar, and annotation tools to meet specific application needs and branding requirements.
-
-#### Designed with Camera Capture in Mind
-Dynamsoft Document Viewer is designed for seamless integration with camera capture. It features five built-in viewer types, with the first three optimized for camera capture scenarios:
-- Edit Viewer: Provides image quality enhancement filters.
-
-- Capture Viewer: Includes built-in camera control for continuous capture.
-
-- Perspective Viewer: Equipped with document cropping features; for document detection, using Dynamsoft Document Normalizer is recommended.
-
-- Browse Viewer
-
-- Custom Viewer
-
-As part of the Mobile Web Capture solution, this viewer helps developers create efficient, accurate, and user-friendly workflows, from camera capture to document finalization.
-
 ## Table of Contents
 
+- [Introduction](#introduction)
 - [System Requirements](#system-requirements)
 - [License Key](#license-key)
 - [Adding the dependency](#adding-the-dependency)
@@ -63,13 +17,68 @@ As part of the Mobile Web Capture solution, this viewer helps developers create 
 - [License Agreement](#license-agreement)
 - [Changelog](#changelog)
 
-# System Requirements
+## Introduction
+
+[Dynamsoft Document Viewer (DDV)](https://www.dynamsoft.com/document-viewer/docs/introduction/index.html) is a browser-based JavaScript SDK designed for viewing and editing images and PDFs. It provides a wide range of functionalities, including PDF annotation, page manipulation, image quality enhancement, and document saving.
+
+### Security
+
+Dynamsoft Document Viewer does not rely on any external third-party JavaScript library. All processing, such as rendering and editing, is securely performed within the browser. This architecture eliminates the need for a server-side backend, ensuring security compliance and scalability.
+
+### Browser and Platform Compatibility
+
+Dynamsoft Document Viewer is designed to work seamlessly across different browsers and platforms. It is compatible with major browsers like Chrome, Firefox, Safari, and Edge, ensuring a consistent user experience. Additionally, it supports various operating systems, including Windows, macOS, Linux, iOS, and Android, allowing users to access documents from any device.
+
+### Supported File Types
+
+Users can open, edit, and save PDFs, as well as images in various formats, such as JPEG, PNG, and TIFF.
+
+### Annotation Types
+
+Dynamsoft Document Viewer supports a variety of annotation types to enhance document interaction and collaboration. Users can add, edit, and delete annotations such as:
+
+- text
+- highlight
+- underline
+- strikeout
+- shape
+- stamp
+- freehand drawing
+
+### Data Management Concepts
+
+Dynamsoft Document Viewer organizes data using two main concepts: "document" and "page". A document can contain one or multiple pages, and each page must belong to a single document.
+
+- Page: The smallest unit of data management, currently represented as an image. Each page has a unique pageUid.
+- Document: A collection of pages, each with a unique docUid. Documents collectively make up the entire data set.
+Managing data, therefore, involves managing documents and pages.
+
+If you are using the default UI of DDV, data processing and management are handled internally.
+
+### UI Customization
+
+The SDK offers extensive customization options, enabling developers to tailor the UI to meet specific application needs and branding requirements.
+
+### Designed with Camera Capture in Mind
+
+Dynamsoft Document Viewer is designed for seamless integration with camera capture. It features five built-in viewer types, with the first three optimized for camera capture scenarios:
+
+- Edit Viewer
+- Capture Viewer
+- Perspective Viewer
+- Browse Viewer
+- Custom Viewer
+
+The viewers help developers create efficient, accurate, and user-friendly workflows, from camera capture to document finalization.
+
+
+## System Requirements
 
 The SDK requires the following features to work:
 
 - `WebAssembly`, `Blob`, `URL`/`createObjectURL`, `Web Workers`
 
-## Supported Browsers
+Supported Browsers:
 
 The following table is a list of supported browsers based on the above requirements:
 
@@ -84,17 +93,17 @@ Apart from the browsers, the operating systems may impose some limitations of th
 
 ## License Key
 
-[![](https://img.shields.io/badge/Get-30--day%20FREE%20Trial%20License-blue)](https://www.dynamsoft.com/customer/license/trialLicense/?product=mwc&utm_source=npm)
+[![](https://img.shields.io/badge/Get-30--day%20FREE%20Trial%20License-blue)](https://www.dynamsoft.com/customer/license/trialLicense/?product=ddv&utm_source=npm)
 
-## Adding the dependency
+## Adding the Dependency
 
 Please refer to [this article](https://www.dynamsoft.com/document-viewer/docs/gettingstarted/add_dependency.html).
 
 ## Creating HelloWorld
 
-[How to create HelloWorld](https://www.dynamsoft.com/document-viewer/docs/gettingstarted/helloworld.html)
+Please refer to the guide: [How to create HelloWorld](https://www.dynamsoft.com/document-viewer/docs/gettingstarted/helloworld.html)
 
-Review the complete code:
+Complete code:
 
 ```html
 <!DOCTYPE html>
@@ -128,14 +137,13 @@ Review the complete code:
 <script type="module">
     (async () => {
         // Public trial license which is valid for 24 hours
-        // You can request a 30-day trial key from https://www.dynamsoft.com/customer/license/trialLicense/?product=mwc
+        // You can request a 30-day trial key from https://www.dynamsoft.com/customer/license/trialLicense/?product=ddv
         Dynamsoft.DDV.Core.license = "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9";
         Dynamsoft.DDV.Core.engineResourcePath = "https://cdn.jsdelivr.net/npm/dynamsoft-document-viewer@latest/dist/engine";
         await Dynamsoft.DDV.Core.init();
-        Dynamsoft.DDV.setProcessingHandler("imageFilter", new Dynamsoft.DDV.ImageFilter());
         const editViewer = new Dynamsoft.DDV.EditViewer({
             container: "container",
-            uiConfig: Dynamsoft.DDV.getDefaultUiConfig("editViewer", {includeAnnotationSet: true}),
+            uiConfig: Dynamsoft.DDV.getDefaultUiConfig("editViewer"),
         });
     })();
 </script>
@@ -146,30 +154,6 @@ Review the complete code:
 
 * [Developer's Guide](https://www.dynamsoft.com/document-viewer/docs/introduction/index.html)
 * [API Reference](https://www.dynamsoft.com/document-viewer/docs/api/index.html)
-
-## Features
-
-Generally, the features of DDV can be divided to two parts as below.
-
-### Data Management
-
-Data management is to manage the data which is imported into DDV. It is managed from the following three aspects:
-
-- Document Management: Document creation/deletion/merging, etc.
-- Page management: Pages in documents loading/saving/deleting/moving, etc.
-- Annotation management:  Adding/deleting/selecting/dragging/resizing/rotating annotations, etc. 
-
-### Viewers
-
-Viewers are used to display the data. According to the different uses of viewers, DDV provides five different viewer types, which are implemented through five viewer classes.
-
-- Edit Viewer: Edit the pages in document, such as, rotating, cropping, filtering, annotating, etc. and adjust the layout of the display.
-- Capture Viewer: Control camera, play video stream, and capture the images from camera.
-- Perspective Viewer: Do page boundary manual adjustment & perspective transformation.
-- Browse Viewer: Display pages in multiple-mode, pages can be multiple selected.
-- Custom Viewer: No built-in UI or functionality, which is used for creating your own viewer.
-
-[More](https://www.dynamsoft.com/document-viewer/docs/features/index.html)
 
 ## Contact Us
 
