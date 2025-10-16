@@ -12,14 +12,13 @@
 - [Adding the Dependency](#adding-the-dependency)
 - [Creating HelloWorld](#creating-helloworld)
 - [Documentation](#documentation)
-- [Features](#features)
 - [Contact Us](#contact-us)
 - [License Agreement](#license-agreement)
 - [Changelog](#changelog)
 
 ## Introduction
 
-[Dynamsoft Document Viewer (DDV)](https://www.dynamsoft.com/document-viewer/docs/introduction/index.html) is a browser-based JavaScript SDK designed for viewing and editing images and PDFs. It provides a wide range of functionalities, including PDF annotation, page manipulation, image quality enhancement, and document saving.
+[Dynamsoft Document Viewer (DDV)](https://www.dynamsoft.com/document-viewer/docs/introduction/index.html) is a browser-based JavaScript SDK designed for viewing and editing images and PDFs. It provides a wide range of functionalities, including PDF annotation, page manipulation, image quality enhancement, and document saving. To see it in action, please visit this [online demo](https://demo.dynamsoft.com/document-viewer/).
 
 ### Security
 
