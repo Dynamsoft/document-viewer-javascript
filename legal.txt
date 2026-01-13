@@ -32,19 +32,13 @@ Copyright notice:
 
 ++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++
 
-libtiff 4.7.0
+libtiff 4.7.1
 (https://libtiff.gitlab.io/libtiff/)
 
-Silicon Graphics has seen fit to allow us to give this work away.  It
-is free.  There is no support or guarantee of any sort as to its
-operations, correctness, or whatever.  If you do anything useful with
-all or parts of it you need to honor the copyright notices.   I would
-also be interested in knowing about it and, hopefully, be acknowledged.
+# LibTIFF license
 
-The legal way of saying that is:
-
-Copyright (c) 1988-1997 Sam Leffler
-Copyright (c) 1991-1997 Silicon Graphics, Inc.
+Copyright © 1988-1997 Sam Leffler\
+Copyright © 1991-1997 Silicon Graphics, Inc.
 
 Permission to use, copy, modify, distribute, and sell this software and 
 its documentation for any purpose is hereby granted without fee, provided
@@ -65,9 +59,35 @@ WHETHER OR NOT ADVISED OF THE POSSIBILITY OF DAMAGE, AND ON ANY THEORY OF
 LIABILITY, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE 
 OF THIS SOFTWARE.
 
+# Lempel-Ziv & Welch Compression (tif_lzw.c) license
+The code of tif_lzw.c is derived from the compress program whose code is
+derived from software contributed to Berkeley by James A. Woods,
+derived from original work by Spencer Thomas and Joseph Orost.
+
+The original Berkeley copyright notice appears below in its entirety:
+
+Copyright (c) 1985, 1986 The Regents of the University of California.
+All rights reserved.
+
+This code is derived from software contributed to Berkeley by
+James A. Woods, derived from original work by Spencer Thomas
+and Joseph Orost.
+
+Redistribution and use in source and binary forms are permitted
+provided that the above copyright notice and this paragraph are
+duplicated in all such forms and that any documentation,
+advertising materials, and other materials related to such
+distribution and use acknowledge that the software was developed
+by the University of California, Berkeley.  The name of the
+University may not be used to endorse or promote products derived
+from this software without specific prior written permission.
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
 ++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++
 
-libpng 1.6.43
+libpng 1.6.52
 (http://www.libpng.org/)
 
 COPYRIGHT NOTICE, DISCLAIMER, and LICENSE
@@ -76,8 +96,8 @@ COPYRIGHT NOTICE, DISCLAIMER, and LICENSE
 PNG Reference Library License version 2
 ---------------------------------------
 
- * Copyright (c) 1995-2024 The PNG Reference Library Authors.
- * Copyright (c) 2018-2024 Cosmin Truta.
+ * Copyright (c) 1995-2025 The PNG Reference Library Authors.
+ * Copyright (c) 2018-2025 Cosmin Truta.
  * Copyright (c) 2000-2002, 2004, 2006-2018 Glenn Randers-Pehrson.
  * Copyright (c) 1996-1997 Andreas Dilger.
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -945,7 +965,7 @@ limitations under the License.
 
 ++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++
 
-openjpeg 2.5.2
+openjpeg 2.5.4
 (https://github.com/uclouvain/openjpeg)
 
 /*
@@ -1035,7 +1055,7 @@ Matthias Wandel
 
 ++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++
 
-libjpeg-turbo 3.1.0
+libjpeg-turbo 3.1.2
 (https://libjpeg-turbo.org/)
 
 libjpeg-turbo Licenses
@@ -1134,7 +1154,7 @@ intended solely for clarification.
 The Modified (3-clause) BSD License
 ===================================
 
-Copyright (C)2009-2024 D. R. Commander.  All Rights Reserved.<br>
+Copyright (C)2009-2025 D. R. Commander.  All Rights Reserved.<br>
 Copyright (C)2015 Viktor Szathmáry.  All Rights Reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -1176,7 +1196,7 @@ that were granted to the IJG for code derived from their software.
 
 ++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++
 
-freetype 2.13.3
+freetype 2.14.1
 (https://freetype.org/)
 
 FREETYPE LICENSES
@@ -1216,21 +1236,22 @@ in earlier FreeType versions.
 The gzip  module uses the  zlib license (see  `src/gzip/zlib.h`) which
 too is compatible to the above two licenses.
 
-The files `src/autofit/ft-hb.c` and `src/autofit/ft-hb.h` contain code
-taken almost  verbatim from the  HarfBuzz file `hb-ft.cc`,  which uses
-the 'Old MIT' license, compatible to the above two licenses.
+The   files   `src/autofit/ft-hb-ft.c`,   `src/autofit/ft-hb-decls.h`,
+`src/autofit/ft-hb-types.h`,     and    `src/autofit/hb-script-list.h`
+contain code taken (almost) verbatim  from the HarfBuzz library, which
+uses the 'Old MIT' license compatible to the above two licenses.
 
 The  MD5 checksum  support  (only used  for  debugging in  development
 builds) is in the public domain.
 
 ++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++--++
 
-glaze 1.6.2
+glaze 2.9.5
 (https://github.com/stephenberry/glaze)
 
 MIT License
 
-Copyright (c) 2019 - present, Anyar Inc. and Stephen Berry
+Copyright (c) 2019 - present, Stephen Berry
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

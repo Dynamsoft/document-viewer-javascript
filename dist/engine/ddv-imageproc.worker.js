@@ -4,7 +4,7 @@
 * @website http://www.dynamsoft.com
 * @copyright Copyright 2025, Dynamsoft Corporation
 * @author Dynamsoft
-* @version 3.1.0 (2025-09-16T06:38:44.718Z)
+* @version 3.2.0 (2025-12-24T06:07:33.342Z)
 * @fileoverview Dynamsoft JavaScript Library for Image IO WASM Worker
 * 
 */

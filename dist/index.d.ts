@@ -248,6 +248,7 @@ declare class ImageIOWasmEnv {
 	static getLicenseInfo(license: any, isLts: boolean, uuid: string): Promise<LicenseInfo>;
 	private static Init;
 	static isResourceDirValid(maxRetries?: number, retryDelay?: number): Promise<boolean>;
+	static isResourceVersionMatch(): Promise<boolean>;
 	static loadPdfReader(license: any, isLts: boolean, uuid: string): Promise<boolean | void>;
 	static loadMain(license: any, isLts: boolean, uuid: string): Promise<boolean | void>;
 	static load(license: any, isLts: boolean, uuid: string): Promise<void>;
