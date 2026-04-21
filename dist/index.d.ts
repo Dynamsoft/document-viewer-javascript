@@ -222,7 +222,7 @@ declare class ImageFilter implements IImageFilter {
 }
 declare class ImageIOWasmEnv {
 	#private;
-	static onAfterSetCustomFonts: Hooks<any>;
+	static onAfterSetCustomFonts: any;
 	static resourceDir: string;
 	static fetchOptions: {
 		mode: string;
