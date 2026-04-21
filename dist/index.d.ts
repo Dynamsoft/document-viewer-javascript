@@ -10,6 +10,7 @@ declare class AnnotationManager {
 	sendAnnotationBackward(annotationUid: string): boolean;
 	bringAnnotationToFront(annotationUid: string): boolean;
 	sendAnnotationToBack(annotationUid: string): boolean;
+	applyRedactions(pageUid: string, annotationUids?: string[]): Promise<boolean>;
 	on<K extends keyof AnnotationManagerEventMap>(eventName: K, listener: (event: AnnotationManagerEventMap[K]) => any): void;
 	off<K extends keyof AnnotationManagerEventMap>(eventName: K, listener?: (event: AnnotationManagerEventMap[K]) => any): void;
 }
@@ -145,7 +146,6 @@ declare class Elements {
 	static get AutoDetect(): string;
 	static get AutoCapture(): string;
 	static get ImagePreview(): string;
-	static get Rotate(): string;
 	static get RotateLeft(): string;
 	static get RotateRight(): string;
 	static get Delete(): string;
@@ -208,15 +208,10 @@ declare class Elements {
 	static get TextSelectionMode(): string;
 	static get TextSearchPanel(): string;
 	static get TextSearchPanelSwitch(): string;
-}
-declare class Ellipse extends BaseAnnotation<EllipseAnnotationOptions> {
-	constructor(options?: EllipseAnnotationOptions);
-	get type(): string;
-}
-declare class Highlight extends BaseAnnotation<HighlightAnnotationOptions> {
-	constructor(options?: HighlightAnnotationOptions);
-	get type(): string;
-	updateOptions(options: HighlightAnnotationOptions): boolean;
+	static get RedactionSet(): string;
+	static get RedactionMode(): string;
+	static get RedactPages(): string;
+	static get RedactionApply(): string;
 }
 declare class ImageFilter implements IImageFilter {
 	#private;
@@ -227,6 +222,7 @@ declare class ImageFilter implements IImageFilter {
 }
 declare class ImageIOWasmEnv {
 	#private;
+	static onAfterSetCustomFonts: Hooks<any>;
 	static resourceDir: string;
 	static fetchOptions: {
 		mode: string;
@@ -239,6 +235,7 @@ declare class ImageIOWasmEnv {
 	static get isApple(): boolean;
 	static get version(): string;
 	static enableDebugOutput(enable: boolean, callback: (...args: any) => void): void;
+	static setVerboseOutput(): void;
 	static hasDebugOutput(): boolean;
 	static get blobReadModeSettings(): BlobReadModeSettings;
 	static set blobReadModeSettings(value: BlobReadModeSettings);
@@ -249,6 +246,9 @@ declare class ImageIOWasmEnv {
 	private static Init;
 	static isResourceDirValid(maxRetries?: number, retryDelay?: number): Promise<boolean>;
 	static isResourceVersionMatch(): Promise<boolean>;
+	static getValidCustomFontsConfig(config: CustomFontsConfig): any;
+	static setCustomFontsPath(dir: string, maxRetries?: number, retryDelay?: number): Promise<boolean>;
+	static setCustomFontsConfig(config: any): Promise<void>;
 	static loadPdfReader(license: any, isLts: boolean, uuid: string): Promise<boolean | void>;
 	static loadMain(license: any, isLts: boolean, uuid: string): Promise<boolean | void>;
 	static load(license: any, isLts: boolean, uuid: string): Promise<void>;
@@ -261,86 +261,6 @@ declare class ImageIOWasmEnv {
 	private static getUseSimd;
 	static getPdfFonts(): string[];
 	static getPdfInfo(blob: Blob, password?: string): Promise<unknown>;
-}
-declare class Incomplete {
-	#private;
-	uid: string;
-	creationDate: string;
-	modificationDate: string;
-	constructor(raw: any);
-	get source(): "user" | "file" | "api" | "";
-	get type(): string;
-	get pageUid(): string;
-	get raw(): any;
-	get flattened(): boolean;
-	set flattened(value: boolean);
-}
-declare class Ink extends BaseAnnotation<InkAnnotationOptions> {
-	constructor(options?: InkAnnotationOptions);
-	get type(): string;
-}
-declare class Line extends BaseAnnotation<LineAnnotationOptions> {
-	constructor(options?: LineAnnotationOptions);
-	get type(): string;
-	updateOptions(options: LineAnnotationOptions): boolean;
-}
-declare class Polygon extends BaseAnnotation<PolygonAnnotationOptions> {
-	constructor(options?: PolygonAnnotationOptions);
-	get type(): string;
-	updateOptions(options: PolygonAnnotationOptions): boolean;
-}
-declare class Polyline extends BaseAnnotation<PolylineAnnotationOptions> {
-	constructor(options?: PolylineAnnotationOptions);
-	get type(): string;
-	updateOptions(options: PolylineAnnotationOptions): boolean;
-}
-declare class Rectangle extends BaseAnnotation<RectAnnotationOptions> {
-	constructor(options?: RectAnnotationOptions);
-	get type(): string;
-}
-declare class Stamp {
-	#private;
-	uid: string;
-	creationDate: string;
-	modificationDate: string;
-	constructor(options?: StampAnnotationOptions);
-	get source(): "user" | "file" | "api" | "";
-	get type(): string;
-	get pageUid(): string;
-	get flattened(): boolean;
-	set flattened(value: boolean);
-	getOptions(): StampAnnotationOptions;
-	updateOptions(options: StampAnnotationOptions): Promise<void>;
-}
-declare class Strikeout extends BaseAnnotation<StrikeoutAnnotationOptions> {
-	constructor(options?: StrikeoutAnnotationOptions);
-	get type(): string;
-	updateOptions(options: StrikeoutAnnotationOptions): boolean;
-}
-declare class TextBox extends BaseAnnotation<TextBoxAnnotationOptions> {
-	constructor(options?: TextBoxAnnotationOptions);
-	get type(): string;
-}
-declare class TextTypewriter extends BaseAnnotation<TextTypewriterAnnotationOptions> {
-	constructor(options?: TextTypewriterAnnotationOptions);
-	get type(): string;
-	updateOptions(options: TextTypewriterAnnotationOptions): boolean;
-}
-declare class Underline extends BaseAnnotation<UnderlineAnnotationOptions> {
-	constructor(options?: UnderlineAnnotationOptions);
-	get type(): string;
-	updateOptions(options: UnderlineAnnotationOptions): boolean;
-}
-declare class Unknown {
-	uid: string;
-	creationDate: string;
-	modificationDate: string;
-	constructor();
-	get source(): "user" | "file" | "api" | "";
-	get type(): string;
-	get pageUid(): string;
-	get flattened(): boolean;
-	set flattened(value: boolean);
 }
 declare class ViewerCommon {
 	getIsBoundContainer(viewer: Viewer): any;
@@ -637,6 +557,37 @@ export declare class EditViewer {
 	getVisiblePagesInfo(): PageVisualInfo[];
 	getAnnotationDrawingStyle(): AnnotationDrawingStyleConfig;
 }
+export declare class Ellipse extends BaseAnnotation<EllipseAnnotationOptions> {
+	constructor(options?: EllipseAnnotationOptions);
+	get type(): "ellipse";
+}
+export declare class Highlight extends BaseAnnotation<HighlightAnnotationOptions> {
+	constructor(options?: HighlightAnnotationOptions);
+	get type(): "highlight";
+	updateOptions(options: HighlightAnnotationOptions): boolean;
+}
+export declare class Incomplete {
+	#private;
+	uid: string;
+	creationDate: string;
+	modificationDate: string;
+	constructor(raw: any);
+	get source(): "user" | "file" | "api" | "";
+	get type(): "incomplete";
+	get pageUid(): string;
+	get raw(): any;
+	get flattened(): boolean;
+	set flattened(value: boolean);
+}
+export declare class Ink extends BaseAnnotation<InkAnnotationOptions> {
+	constructor(options?: InkAnnotationOptions);
+	get type(): "ink";
+}
+export declare class Line extends BaseAnnotation<LineAnnotationOptions> {
+	constructor(options?: LineAnnotationOptions);
+	get type(): "line";
+	updateOptions(options: LineAnnotationOptions): boolean;
+}
 export declare class PerspectiveViewer {
 	#private;
 	uid: string;
@@ -703,6 +654,69 @@ export declare class PerspectiveViewer {
 	destroy(): void;
 	getVisiblePagesInfo(): PageVisualInfo[];
 }
+export declare class Polygon extends BaseAnnotation<PolygonAnnotationOptions> {
+	constructor(options?: PolygonAnnotationOptions);
+	get type(): "polygon";
+	updateOptions(options: PolygonAnnotationOptions): boolean;
+}
+export declare class Polyline extends BaseAnnotation<PolylineAnnotationOptions> {
+	constructor(options?: PolylineAnnotationOptions);
+	get type(): "polyline";
+	updateOptions(options: PolylineAnnotationOptions): boolean;
+}
+export declare class Rectangle extends BaseAnnotation<RectAnnotationOptions> {
+	constructor(options?: RectAnnotationOptions);
+	get type(): "rectangle";
+}
+export declare class Redaction extends BaseAnnotation<RedactionAnnotationOptions> {
+	constructor(options?: RedactionAnnotationOptions);
+	get type(): "redaction";
+	updateOptions(options: RedactionAnnotationOptions): boolean;
+}
+export declare class Stamp {
+	#private;
+	uid: string;
+	creationDate: string;
+	modificationDate: string;
+	constructor(options?: StampAnnotationOptions);
+	get source(): "user" | "file" | "api" | "";
+	get type(): "stamp";
+	get pageUid(): string;
+	get flattened(): boolean;
+	set flattened(value: boolean);
+	getOptions(): StampAnnotationOptions;
+	updateOptions(options: StampAnnotationOptions): Promise<void>;
+}
+export declare class Strikeout extends BaseAnnotation<StrikeoutAnnotationOptions> {
+	constructor(options?: StrikeoutAnnotationOptions);
+	get type(): "strikeout";
+	updateOptions(options: StrikeoutAnnotationOptions): boolean;
+}
+export declare class TextBox extends BaseAnnotation<TextBoxAnnotationOptions> {
+	constructor(options?: TextBoxAnnotationOptions);
+	get type(): "textBox";
+}
+export declare class TextTypewriter extends BaseAnnotation<TextTypewriterAnnotationOptions> {
+	constructor(options?: TextTypewriterAnnotationOptions);
+	get type(): "textTypewriter";
+	updateOptions(options: TextTypewriterAnnotationOptions): boolean;
+}
+export declare class Underline extends BaseAnnotation<UnderlineAnnotationOptions> {
+	constructor(options?: UnderlineAnnotationOptions);
+	get type(): "underline";
+	updateOptions(options: UnderlineAnnotationOptions): boolean;
+}
+export declare class Unknown {
+	uid: string;
+	creationDate: string;
+	modificationDate: string;
+	constructor();
+	get source(): "user" | "file" | "api" | "";
+	get type(): "unknown";
+	get pageUid(): string;
+	get flattened(): boolean;
+	set flattened(value: boolean);
+}
 export declare const DDV: {
 	/** The document manager object */
 	documentManager: DocumentManager;
@@ -723,6 +737,7 @@ export declare const DDV: {
 	EditViewer: typeof EditViewer;
 	/** The constructor of the PerspectiveViewer class. */
 	PerspectiveViewer: typeof PerspectiveViewer;
+	renderingMode: RenderModeEnum;
 	readonly lastError: LastError;
 	clearLastError(): void;
 	Experiments: {
@@ -798,7 +813,8 @@ export declare const enum AnnotationParserTypeEnum {
 	UNDERLINE = "underline",
 	STRIKEOUT = "strikeout",
 	INCOMPLETE = "incomplete",
-	UNKNOWN = "unknown"
+	UNKNOWN = "unknown",
+	REDACTION = "redaction"
 }
 export declare const enum DisplayModeEnum {
 	SINGLE = "single",
@@ -822,6 +838,10 @@ export declare const enum MIME {
 	APPLICATION_PDF = "application/pdf",
 	TEXT_PLAIN = "text/plain"
 }
+export declare const enum RenderModeEnum {
+	IMAGE = "image",
+	RGBA = "rgba"
+}
 export declare const enum SourceMIME {
 	IMAGE_PNG = "image/png",
 	IMAGE_JPEG = "image/jpeg",
@@ -839,7 +859,8 @@ export declare const enum ToolModeEnum {
 	ZOOM_IN = "zoomIn",
 	ZOOM_OUT = "zoomOut",
 	ANNOTATION = "annotation",
-	TEXT_SELECTION = "textSelection"
+	TEXT_SELECTION = "textSelection",
+	REDACTION = "redaction"
 }
 export declare enum EnumAnnotationRenderMode {
 	NO_ANNOTATIONS = "noAnnotations",
@@ -900,17 +921,13 @@ export declare enum EnumTIFFCompressionType {
 	TIFF_LZW = "tiff/lzw",
 	TIFF_JPEG = "tiff/jpeg"
 }
-export interface AnnotationCommonStyle {
-	x?: number;
-	y?: number;
-	borderWidth?: number;
-	borderColor?: string;
-	background?: string;
-	lineDash?: number[];
-	lineCap?: string;
-	lineJoin?: string;
-	miterLimit?: number;
-	opacity?: number;
+export interface AnnotationAppearance {
+	matrix: number[];
+	/** [left bottom right top] to pdf coordinate. */
+	bbox: number[];
+	objs: OBJS[];
+	transform: number[];
+	blendMode?: string;
 }
 export interface AnnotationConfig {
 	toolbarConfig?: ToolbarConfig;
@@ -939,6 +956,7 @@ export interface AnnotationDrawingStyleConfig {
 	highlight?: HighlightStyle;
 	underline?: UnderlineStyle;
 	strikeout?: StrikeoutStyle;
+	redaction?: RedactionStyle;
 }
 export interface AnnotationLayerChangedEvent {
 	oldAnnotationUidList: string[];
@@ -980,9 +998,10 @@ export interface AnnotationRawData {
 	lineEnding?: string[];
 	date?: string;
 	name?: string;
-	normalAppearance?: NormalAppearance;
+	normalAppearance?: AnnotationAppearance;
 	opacity?: number;
 	rectDifference?: number[];
+	/** [left bottom right top] to pdf coordinate. */
 	rect?: number[];
 	subject?: string;
 	type?: string;
@@ -1005,6 +1024,18 @@ export interface AnnotationRawData {
 	reviewStates: AnnotationRawData[];
 	oriIndex: number;
 	modified: boolean;
+	/** The appearance when mouse is down on the annotation. */
+	downAppearance?: AnnotationAppearance;
+	/** The appearance after applied the redaction. */
+	overlayAppearance?: AnnotationAppearance;
+	/** The appearance when mouse is over the annotation. */
+	rolloverAppearance?: AnnotationAppearance;
+	overlayText?: string;
+	/** The form of textAlign. 0 = left, 1 = center, 2 = right. */
+	q?: number;
+	/** Whether the text should be repeated. 0 = no repeat, 1 = repeat. */
+	repeat?: boolean;
+	redactRanges?: RedactRange[];
 }
 export interface AnnotationSelectionStyle {
 	border?: string;
@@ -1015,7 +1046,17 @@ export interface AnnotationSelectionStyle {
 	ctrlHeight?: string;
 	ctrlBackground?: string;
 }
-export interface AnnotationStyle extends AnnotationCommonStyle {
+export interface AnnotationStyle {
+	x?: number;
+	y?: number;
+	borderWidth?: number;
+	borderColor?: string;
+	background?: string;
+	lineDash?: number[];
+	lineCap?: string;
+	lineJoin?: string;
+	miterLimit?: number;
+	opacity?: number;
 	rx?: number;
 	ry?: number;
 	width?: number;
@@ -1041,6 +1082,20 @@ export interface AnnotationStyle extends AnnotationCommonStyle {
 	iconName?: string;
 	renderBlendMode?: string;
 	lines?: Rect[];
+	redactionLines?: RedactLine[];
+	redactionType?: "text" | "rectangle";
+	overlayBackground?: string;
+	overlayText?: {
+		text?: string;
+		color?: string;
+		textAlign?: "left" | "center" | "right";
+		repeatText?: boolean;
+		autoFontSize?: boolean;
+		fontSize?: number;
+		fontFamily?: string;
+	};
+	outlineColor?: string;
+	appearanceFillColor?: string;
 }
 export interface AnnotationToolbarButton {
 	id?: string;
@@ -1121,6 +1176,10 @@ export interface AnnotationsTypeMap {
 	incomplete: {
 		options: any;
 		return: Incomplete;
+	};
+	redaction: {
+		options: RedactionAnnotationOptions;
+		return: Redaction;
 	};
 }
 export interface AnnotationsTypeMapOuter extends AnnotationsTypeMap {
@@ -1256,6 +1315,10 @@ export interface CreateDocumentOptions {
 	author?: string;
 	creationDate?: string;
 }
+export interface CustomFontsConfig {
+	version: string;
+	fonts: FontsMap;
+}
 export interface CustomViewerConstructorOptions {
 	container?: HTMLElement | string;
 	uiConfig?: UiConfig;
@@ -1300,6 +1363,13 @@ export interface DisplayTextConfig extends IconComponent {
 	CameraResolution_1080P?: string;
 	CameraResolution_1440P?: string;
 	CameraResolution_2160P?: string;
+	RedactionSet_RedactionMode?: string;
+	RedactionSet_RedactionApply?: string;
+	RedactionSet_RedactPages?: string;
+	RedactPages_Current?: string;
+	RedactPages_Specific?: string;
+	RedactPages_Ok?: string;
+	RedactPages_Cancel?: string;
 }
 export interface DocumentDetectConfidence {
 	angleConfidence: number;
@@ -1733,6 +1803,10 @@ export interface IconComponent {
 	SendToBack?: string;
 	TextSearchPanelSwitch?: string;
 	TextSelectionMode?: string;
+	RedactPages?: string;
+	RedactionApply?: string;
+	RedactionMode?: string;
+	RedactionSet?: string;
 }
 export interface ImageFilterItem {
 	type: string;
@@ -1745,6 +1819,7 @@ export interface InfoDetailsMap {
 	"filter": FilterInfo;
 	"perspective": PerspectiveInfo;
 	"loadWasm": LoadWasmInfo;
+	"printPreparation": PrintPreparationInfo;
 }
 export interface InfoObject<K extends keyof InfoDetailsMap> {
 	id: number;
@@ -1798,7 +1873,7 @@ export interface LineStyle extends PolylineStyle {
 }
 export interface LoadSourceInfo {
 	docUid: string;
-	current: number;
+	processed: number;
 	total: number;
 }
 export interface LoadSourceOptions {
@@ -1814,13 +1889,6 @@ export interface MergeDocumentsOptions {
 	creationDate?: string;
 	deleteOriginal?: boolean;
 	includeAnnotations?: boolean;
-}
-export interface NormalAppearance {
-	matrix: number[];
-	bbox: number[];
-	objs: OBJS[];
-	transform: number[];
-	blendMode?: string;
 }
 export interface OBJS {
 	charSpace?: number;
@@ -1912,7 +1980,7 @@ export interface PaletteConfig {
 export interface ParsedAnnotation {
 	uid?: string;
 	type?: AnnotationParserTypeEnum;
-	style?: AnnotationStyle | AnnotationStyle[];
+	style?: AnnotationStyle;
 	transform?: AnnotationTransform;
 	iconColor?: string;
 	comment?: ParsedAnnotationComment;
@@ -1921,6 +1989,7 @@ export interface ParsedAnnotation {
 	raw?: AnnotationRawData;
 	customData?: any;
 	parsedOriIndex?: number;
+	remainingRedactionStyle?: RemainingRedactionStyle;
 }
 export interface ParsedAnnotationComment extends ParsedAnnotationReply {
 	replies?: ParsedAnnotationReply[];
@@ -2108,6 +2177,11 @@ export interface PolylineStyle extends RectangleStyle {
 		end: EnumLineEnding;
 	};
 }
+export interface PrintPreparationInfo {
+	docUid: string;
+	processed: number;
+	total: number;
+}
 export interface PrintSettings {
 	printAnnotation?: boolean;
 }
@@ -2160,6 +2234,52 @@ export interface RectangleStyle extends BaseAnnotationStyle {
 	borderColor?: string;
 	background?: string;
 	lineDash?: number[];
+}
+export interface RedactLine {
+	left: number;
+	top: number;
+	width: number;
+	height: number;
+	isStroke: boolean;
+}
+/** The redacted range of text and image. */
+export interface RedactRange {
+	startIndex: number;
+	endIndex: number;
+}
+export interface RedactionAnnotationOptions {
+	rects: RectXY[];
+	redactionType?: "rectangle" | "text";
+	background?: string;
+	borderColor?: string;
+	overlayBackground?: string;
+	overlayText?: RedactionOverlayText;
+	flags?: Flags;
+}
+export interface RedactionOverlayText {
+	text?: string;
+	color?: string;
+	textAlign?: "left" | "center" | "right";
+	fontSize?: number;
+	fontFamily?: string;
+	repeatText?: boolean;
+	autoFontSize?: boolean;
+}
+export interface RedactionStyle {
+	background?: string;
+	borderColor?: string;
+	overlayBackground?: string;
+	overlayText?: {
+		text: string;
+		color?: string;
+		textAlign?: "left" | "center" | "right";
+		fontSize?: number;
+		fontFamily?: string;
+		repeatText?: boolean;
+		autoFontSize?: boolean;
+	};
+}
+export interface RemainingRedactionStyle {
 }
 export interface RenderPageTask {
 	taskUid: string;
@@ -2240,7 +2360,7 @@ export interface SavePngSettings {
 export interface SaveSourceInfo {
 	docUid: string;
 	pageUids: string[];
-	current: number;
+	processed: number;
 	total: number;
 }
 export interface SaveTiffSettings {
@@ -2349,6 +2469,7 @@ export interface ToolbarConfig {
 	highlightButton?: AnnotationToolbarButton;
 	underlineButton?: AnnotationToolbarButton;
 	strikeoutButton?: AnnotationToolbarButton;
+	redactionApplyButton?: AnnotationToolbarButton;
 }
 export interface Tooltip extends IconComponent {
 }
@@ -2434,11 +2555,17 @@ export type Cursor = "auto" | "default" | "none" | "context-menu" | "help" | "po
 export type DisplayMode = "single" | "continuous";
 export type ExceptionType = "fail" | "ignore";
 export type FitMode = "width" | "height" | "window" | "actualSize";
+export type FontItem = {
+	file: string;
+	weight: number;
+	italic?: boolean;
+};
+export type FontsMap = Record<string, FontItem[]>;
 export type FreeTextAlign = "left" | "right" | "center" | "justify";
 export type ITextSearchTriggeredEvent = ITextSearchedInfo[];
 export type ITextSelectedEvent = ITextSelectedInfo[];
 export type InfoStatus = "Pending" | "InProgress" | "Completed" | "Failed" | "Canceled";
-export type OuterAnnotation = Rectangle | Ellipse | Ink | Line | Polygon | Polyline | Stamp | TextBox | TextTypewriter;
+export type OuterAnnotation = Rectangle | Ellipse | Ink | Line | Polygon | Polyline | Stamp | TextBox | TextTypewriter | Redaction | Highlight | Underline | Strikeout;
 export type Quad = [
 	[
 		number,
@@ -2457,7 +2584,7 @@ export type Quad = [
 		number
 	]
 ];
-export type ToolMode = "pan" | "crop" | "annotation" | "textSelection";
+export type ToolMode = "pan" | "crop" | "annotation" | "textSelection" | "redaction";
 export type Viewer = any;
 export type ViewerType = "editViewer" | "perspectiveViewer" | "captureViewer" | "browseViewer";
 export type WasmModuleName = "core" | "pdf" | "proc";
