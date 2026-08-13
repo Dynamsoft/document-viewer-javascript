@@ -81,12 +81,12 @@ Supported Browsers:
 
 The following table is a list of supported browsers based on the above requirements:
 
-| Browser Name |             PC                   |   Mobile    |
-| :----------: | :------------------------------: | :---------: |
-|    Chrome    |             v75+                 |   v75+      |
-|   Firefox    |             v69+                 |   v79+      |
-|    Safari    |             v14+                 |   v15+      |
-|     Edge     |             v79+                 |   v92+      |
+| Browser Name |             Version              |
+| :----------: | :------------------------------: |
+|    Chrome    |             v92+                 |
+|   Firefox    |             v90+                 |
+|    Safari    |             v15+                 |
+|     Edge     |             v92+                 |
 
 Apart from the browsers, the operating systems may impose some limitations of their own that could restrict the use of the SDKs.
 
@@ -114,6 +114,7 @@ Complete code:
     <title>DDV - HelloWorld</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dynamsoft-document-viewer@latest/dist/ddv.css">
     <script src="https://cdn.jsdelivr.net/npm/dynamsoft-document-viewer@latest/dist/ddv.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-document-viewer@latest/dist/plugins/ddv-plugin-annotation.js"></script>
 </head>
 <style>
     html,body {
@@ -139,6 +140,10 @@ Complete code:
         // You can request a 30-day trial key from https://www.dynamsoft.com/customer/license/trialLicense/?product=ddv
         Dynamsoft.DDV.Core.license = "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9";
         Dynamsoft.DDV.Core.engineResourcePath = "https://cdn.jsdelivr.net/npm/dynamsoft-document-viewer@latest/dist/engine";
+        // Wasm files are loaded on demand by default. Uncomment to preload all.
+        // Dynamsoft.DDV.Core.loadWasm();
+        // Load the annotation plugin.
+        Dynamsoft.DDV.use(Dynamsoft.DDV.AnnotationPlugin);
         await Dynamsoft.DDV.Core.init();
         const editViewer = new Dynamsoft.DDV.EditViewer({
             container: "container",
