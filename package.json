@@ -1,68 +1,68 @@
 {
-  "name": "dynamsoft-document-viewer",
-  "version": "5.0.0",
-  "author": {
-    "name": "Dynamsoft",
-    "url": "https://www.dynamsoft.com"
-  },
-  "license": "SEE LICENSE IN LICENSE.txt",
-  "description": "Dynamsoft Document Viewer (DDV) is an SDK designed to provide different types of viewers to configure and achieve different processing flows for documents.",
-  "devDependencies": {},
-  "directories": {},
-  "files": [
-    "Api Reference.html",
-    "legal.txt",
-    "dist"
-  ],
-  "homepage": "https://www.dynamsoft.com/document-viewer/docs/introduction/index.html",
-  "keywords": [
-    "user interface customize",
-    "viewer",
-    "capturing",
-    "perspective transformation",
-    "image filter",
-    "document detect",
-    "annotation",
-    "pdf viewer"
-  ],
-  "main": "dist/ddv.es.js",
-  "module": "dist/ddv.es.js",
-  "maintainers": [
-    {
-      "name": "Dynamsoft Support Team",
-      "email": "support@dynamsoft.com"
-    }
-  ],
-  "optionalDependencies": {},
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Dynamsoft/document-viewer-javascript"
-  },
-  "types": "dist/index.d.ts",
-  "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/ddv.es.js",
-      "default": "./dist/ddv.es.js"
+    "name": "dynamsoft-document-viewer",
+    "version": "5.0.1",
+    "author": {
+        "name": "Dynamsoft",
+        "url": "https://www.dynamsoft.com"
     },
-    "./dist/ddv.css": "./dist/ddv.css",
-    "./annotation": {
-      "types": "./dist/plugins/ddv-plugin-annotation.es.d.ts",
-      "import": "./dist/plugins/ddv-plugin-annotation.es.js",
-      "default": "./dist/plugins/ddv-plugin-annotation.es.js"
+    "license": "SEE LICENSE IN LICENSE.txt",
+    "description": "Dynamsoft Document Viewer (DDV) is an SDK designed to provide different types of viewers to configure and achieve different processing flows for documents.",
+    "devDependencies": {},
+    "directories": {},
+    "files": [
+        "Api Reference.html",
+        "legal.txt",
+        "dist"
+    ],
+    "homepage": "https://www.dynamsoft.com/document-viewer/docs/introduction/index.html",
+    "keywords": [
+        "user interface customize",
+        "viewer",
+        "capturing",
+        "perspective transformation",
+        "image filter",
+        "document detect",
+        "annotation",
+        "pdf viewer"
+    ],
+    "main": "dist/ddv.es.js",
+    "module": "dist/ddv.es.js",
+    "maintainers": [
+        {
+            "name": "Dynamsoft Support Team",
+            "email": "support@dynamsoft.com"
+        }
+    ],
+    "optionalDependencies": {},
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Dynamsoft/document-viewer-javascript"
     },
-    "./camera": {
-      "types": "./dist/plugins/ddv-plugin-camera.es.d.ts",
-      "import": "./dist/plugins/ddv-plugin-camera.es.js",
-      "default": "./dist/plugins/ddv-plugin-camera.es.js"
+    "types": "dist/index.d.ts",
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/ddv.es.js",
+            "default": "./dist/ddv.es.js"
+        },
+        "./dist/ddv.css": "./dist/ddv.css",
+        "./annotation": {
+            "types": "./dist/plugins/ddv-plugin-annotation.es.d.ts",
+            "import": "./dist/plugins/ddv-plugin-annotation.es.js",
+            "default": "./dist/plugins/ddv-plugin-annotation.es.js"
+        },
+        "./camera": {
+            "types": "./dist/plugins/ddv-plugin-camera.es.d.ts",
+            "import": "./dist/plugins/ddv-plugin-camera.es.js",
+            "default": "./dist/plugins/ddv-plugin-camera.es.js"
+        },
+        "./imagePdf": {
+            "types": "./dist/plugins/ddv-plugin-image-pdf.es.d.ts",
+            "import": "./dist/plugins/ddv-plugin-image-pdf.es.js",
+            "default": "./dist/plugins/ddv-plugin-image-pdf.es.js"
+        }
     },
-    "./imagePdf": {
-      "types": "./dist/plugins/ddv-plugin-image-pdf.es.d.ts",
-      "import": "./dist/plugins/ddv-plugin-image-pdf.es.js",
-      "default": "./dist/plugins/ddv-plugin-image-pdf.es.js"
-    }
-  },
-  "sideEffects": false,
-  "private": false
+    "sideEffects": false,
+    "private": false
 }
